@@ -14,7 +14,6 @@
     2: Inverse
 */
 
-
 class Zone
 {
 public:
@@ -34,6 +33,7 @@ public:
     // Constructor - Destructor
     Zone();
     Zone(unsigned int _x, unsigned int _y, unsigned int _textSize, unsigned int _countChars);
+    Zone(unsigned int _x, unsigned int _y, unsigned int _textSize, unsigned int _countChars, String _val);
     ~Zone();
 
     // Functions
@@ -95,6 +95,18 @@ Zone::Zone(unsigned int _x, unsigned int _y, unsigned int _textSize, unsigned in
     // Calculated
     width = 6 * countChars * textSize - textSize; // Bestimmt die exakt benötigte Breite für die Zone
     height = textSize * 7 + 1;
+}
+
+Zone::Zone(unsigned int _x, unsigned int _y, unsigned int _textSize, unsigned int _countChars, String _val)
+{
+    x = _x;
+    y = _y;
+    textSize = _textSize;
+    countChars = _countChars;
+    // Calculated
+    width = 6 * countChars * textSize - textSize; // Bestimmt die exakt benötigte Breite für die Zone
+    height = textSize * 7 + 1;
+    val = _val;
 }
 
 Zone::~Zone()
