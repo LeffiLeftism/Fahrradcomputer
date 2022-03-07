@@ -1,6 +1,5 @@
 #define PI_PICO
 
-
 // IMPORT LIBRARYS & HEADERFILES
 #ifndef ANIMATION_H
 #define ANIMATION_H
@@ -36,7 +35,6 @@ Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &I2C_base, OLED_RESET);
 Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define LED_BUILT_IN 13
 #endif
-
 
 /****** Bitmaps ******/
 /**
@@ -156,10 +154,37 @@ Bitmap bike[] = {
 
 Bitmap hoehe(SCREEN_WIDTH - 17, 41, 17, 15, 45, hoehe1);
 
-Animation animation_bike(bike, 1000);
+Animation animation_bike(bike, 750);
 
 // -------------------- CODE --------------------
 Zone test(0, 0, 2, 8);
+
+class example
+{
+public:
+    int *m_val;
+    Zone **m_z;
+
+public:
+    example(int *val, Zone **z);
+    ~example();
+
+    void print(Adafruit_SSD1306 &display)
+    {
+        (*(m_z))->print(display);
+        (*(m_z + 1))->print(display);
+    }
+};
+
+example::example(int *val, Zone **z)
+{
+    m_val = val;
+    m_z = z;
+}
+
+example::~example()
+{
+}
 
 void setup()
 {
@@ -193,6 +218,29 @@ void setup()
     oled.display();
     delay(2000);
     animation_bike.start();
+
+    // --------------------------------------------
+    oled.clearDisplay();
+    Zone z1(0, 0, 2, 4);
+    Zone z2(0, 30, 2, 4);
+    Zone *zz[] = {&z1, &z2};
+    int a[2];
+    a[0] = 5;
+    a[1] = 3;
+    Zone **prt_z = zz;
+    example e(a, prt_z);
+    int b = *(e.m_val + 1);
+    *e.m_val = 66;
+    // dashboard.zonen[9].setVal(b);
+    // dashboard.zonen[6].setVal(*e.m_val);
+    z1.setVal(6666);
+    z2.setVal(9976);
+    // z1.print(oled);
+    // e.m_z->setVal(6666);
+    // e.m_z->print(oled);
+    e.print(oled);
+    oled.display();
+    delay(5000);
 }
 
 void loop()
