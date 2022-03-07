@@ -133,19 +133,22 @@ unsigned char hoehe1[] = {
     0x00, 0x00, 0x00  // ........................
 };
 
-Zone zonen_dashboard[] = {
-    {0, 0, 3, 4},    // Zone 1     Geschwindigkeit km/h
-    {75, 2, 1, 2},   // Zone 2     Entfernung km
-    {75, 11, 1, 2},  // Zone 3     /h
-    {50, 24, 2, 5},  // Zone 4     rpm
-    {110, 23, 1, 3}, // Zone 5     RPM
-    {110, 32, 1, 3}, // Zone 6     Ped
-    {0, 41, 2, 4},   // Zone 7     power
-    {48, 40, 1, 2},  // Zone 8     power
-    {48, 49, 1, 2},  // Zone 9     tt
-    {62, 41, 2, 4}}; // Zone 10    Höhe über NN
+Zone z1(0, 0, 3, 4);           // Zone 1     speed-value
+Zone z2(75, 2, 1, 2, "km");    // Zone 2     "km"
+Zone z3(75, 11, 1, 2, "/h");   // Zone 3     "/h"
+Zone z4(50, 24, 2, 5);         // Zone 4     rpm-value
+Zone z5(110, 23, 1, 3, "RPM"); // Zone 5     "RPM"
+Zone z6(110, 32, 1, 3, "Ped"); // Zone 6     "Ped"
+Zone z7(0, 41, 2, 4);          // Zone 7     power-value
+Zone z8(48, 40, 1, 2, "PW");   // Zone 8     "PW"
+Zone z9(48, 49, 1, 2, "tt");   // Zone 9     "tt"
+Zone z10(62, 41, 2, 4);        // Zone 10    Höhe über NN -value
 
-Bildschirm dashboard(zonen_dashboard, 10);
+Zone *zonen_dashboard[] = {&z1, &z2, &z3, &z4, &z5, &z6, &z7, &z8, &z9, &z10};
+
+Zone **ptr_zd = zonen_dashboard;
+
+Bildschirm dashboard(ptr_zd, 10);
 
 Bitmap bike[] = {
     {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[0]},
@@ -197,50 +200,10 @@ void setup()
         while (1)
             error();
     }
-    // animation_bike.start();
-
-    for (size_t i = 0; i < 10; i++)
-    {
-        dashboard.zonen[i].setVal(i);
-    }
-
-    dashboard.zonen[0].setVal(11.1, 1);
-    dashboard.zonen[1].setVal("km");
-    dashboard.zonen[2].setVal("/h");
-    dashboard.zonen[3].setVal(222.2, 1);
-    dashboard.zonen[4].setVal("RPM");
-    dashboard.zonen[5].setVal("Ped");
-    dashboard.zonen[6].setVal(3333);
-    dashboard.zonen[7].setVal("PW");
-    dashboard.zonen[8].setVal("tt");
-    dashboard.zonen[9].setVal(4444);
 
     oled.display();
     delay(2000);
     animation_bike.start();
-
-    // --------------------------------------------
-    oled.clearDisplay();
-    Zone z1(0, 0, 2, 4);
-    Zone z2(0, 30, 2, 4);
-    Zone *zz[] = {&z1, &z2};
-    int a[2];
-    a[0] = 5;
-    a[1] = 3;
-    Zone **prt_z = zz;
-    example e(a, prt_z);
-    int b = *(e.m_val + 1);
-    *e.m_val = 66;
-    // dashboard.zonen[9].setVal(b);
-    // dashboard.zonen[6].setVal(*e.m_val);
-    z1.setVal(6666);
-    z2.setVal(9976);
-    // z1.print(oled);
-    // e.m_z->setVal(6666);
-    // e.m_z->print(oled);
-    e.print(oled);
-    oled.display();
-    delay(5000);
 }
 
 void loop()
@@ -249,7 +212,7 @@ void loop()
     hoehe.print(oled);
     if (millis() > 10000)
         animation_bike.setFrame(int(random(3)));
-    dashboard.zonen[0].setVal(millis() / 1000);
+    z1.setVal(millis() / 1000);
     animation_bike.update(oled);
     dashboard.print(oled);
     oled.display();
