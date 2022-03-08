@@ -133,62 +133,34 @@ unsigned char hoehe1[] = {
     0x00, 0x00, 0x00  // ........................
 };
 
-Zone z1(0, 0, 3, 4);           // Zone 1     speed-value
-Zone z2(75, 2, 1, 2, "km");    // Zone 2     "km"
-Zone z3(75, 11, 1, 2, "/h");   // Zone 3     "/h"
-Zone z4(50, 24, 2, 5);         // Zone 4     rpm-value
-Zone z5(110, 23, 1, 3, "RPM"); // Zone 5     "RPM"
-Zone z6(110, 32, 1, 3, "Ped"); // Zone 6     "Ped"
-Zone z7(0, 41, 2, 4);          // Zone 7     power-value
-Zone z8(48, 40, 1, 2, "PW");   // Zone 8     "PW"
-Zone z9(48, 49, 1, 2, "tt");   // Zone 9     "tt"
-Zone z10(62, 41, 2, 4);        // Zone 10    Höhe über NN -value
+Zone z1(0, 0, 3, 4);                // Zone 1     speed-value
+Zone z2(75, 2, 1, 2, "km");         // Zone 2     "km"
+Zone z3(75, 11, 1, 2, "/h");        // Zone 3     "/h"
+Zone z4(50, 24, 2, 5, "4444");      // Zone 4     rpm-value
+Zone z5(110, 23, 1, 3, "RPM");      // Zone 5     "RPM"
+Zone z6(110, 32, 1, 3, "Ped");      // Zone 6     "Ped"
+Zone z7(0, 41, 2, 4, "7777");       // Zone 7     power-value
+Zone z8(48, 40, 1, 2, "PW");        // Zone 8     "PW"
+Zone z9(48, 49, 1, 2, "tt");        // Zone 9     "tt"
+Zone z10(62, 41, 2, 4, "1010");     // Zone 10    Höhe über NN -value
+Zone z11(0, 57, 1, 5, "12:15");     // Zone 11    Uhrzeit
+Zone z12(z11.width + 5, 57, 1, 10); // Zone 12    Debug, Output für alles was notwendig ist
 
-Zone *zonen_dashboard[] = {&z1, &z2, &z3, &z4, &z5, &z6, &z7, &z8, &z9, &z10};
-
+Zone *zonen_dashboard[] = {&z1, &z2, &z3, &z4, &z5, &z6, &z7, &z8, &z9, &z10, &z11, &z12};
 Zone **ptr_zd = zonen_dashboard;
 
-Bildschirm dashboard(ptr_zd, 10);
+static unsigned int aktiverBildschirm = 0; // Trackt den aktiven Bildschirm über alle Bildschirme hinweg
+Bildschirm dashboard(ptr_zd, 12);
 
 Bitmap bike[] = {
     {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[0]},
     {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[1]},
     {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[2]}};
-
+Animation animation_bike(bike, 750);
 Bitmap hoehe(SCREEN_WIDTH - 17, 41, 17, 15, 45, hoehe1);
 
-Animation animation_bike(bike, 750);
-
+unsigned long time_1;
 // -------------------- CODE --------------------
-Zone test(0, 0, 2, 8);
-
-class example
-{
-public:
-    int *m_val;
-    Zone **m_z;
-
-public:
-    example(int *val, Zone **z);
-    ~example();
-
-    void print(Adafruit_SSD1306 &display)
-    {
-        (*(m_z))->print(display);
-        (*(m_z + 1))->print(display);
-    }
-};
-
-example::example(int *val, Zone **z)
-{
-    m_val = val;
-    m_z = z;
-}
-
-example::~example()
-{
-}
-
 void setup()
 {
 #ifndef PI_PICO
@@ -208,17 +180,40 @@ void setup()
 
 void loop()
 {
+    time_1 = millis();
     oled.clearDisplay();
-    hoehe.print(oled);
     if (millis() > 10000)
         animation_bike.setFrame(int(random(3)));
     z1.setVal(millis() / 1000);
-    animation_bike.update(oled);
-    dashboard.print(oled);
+    printBildschirme();
     oled.display();
+    z12.setVal(millis() - time_1, 2);
 }
 
 // ------------------ Eigene Funktionen ------------------
+
+void printBildschirme()
+{
+    switch (aktiverBildschirm)
+    {
+    case 0:
+        hoehe.print(oled);
+        animation_bike.update(oled);
+        dashboard.print(oled);
+        break;
+    case 1:
+        hoehe.print(oled);
+        animation_bike.update(oled);
+        // dashboard.print(oled);
+        break;
+
+    default:
+        hoehe.print(oled);
+        animation_bike.update(oled);
+        dashboard.print(oled);
+        break;
+    }
+}
 
 void error()
 {

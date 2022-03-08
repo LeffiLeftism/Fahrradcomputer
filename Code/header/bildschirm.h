@@ -3,8 +3,6 @@
 #include "zone.h"
 #endif
 
-#define MAX_ANZAHL_ZONEN 10
-
 class Bildschirm
 {
 private:
@@ -13,11 +11,9 @@ private:
     bool m_inverted = false;             // Invertierte Darstellung
 public:                                  //
     Zone **ptr_zonen;                    // Zeigt auf Array, welches die Zonen enthält
-    // Zone zonen[MAX_ANZAHL_ZONEN];        //
-    bool active = false; // Bildschirm aktiv angezeigt
+    bool active = false;                 // Bildschirm aktiv angezeigt
 
     // Constructor - Destructor
-    // Bildschirm(Zone _zonen[MAX_ANZAHL_ZONEN], unsigned int _count_zonen);
     Bildschirm(Zone **zonen, unsigned int _count_zonen);
     ~Bildschirm();
 
@@ -31,24 +27,8 @@ public:                                  //
             (*(ptr_zonen + i))->print(display);
         }
         // display.display();
-
-        // for (size_t i = 0; i < m_count_zonen; i++)
-        // {
-        //     *(ptr_zonen).print(display);
-        // }
     }
 };
-
-// Bildschirm::Bildschirm(Zone _zonen[MAX_ANZAHL_ZONEN], unsigned int _count_zonen)
-// {
-//     m_count_zonen = _count_zonen;
-//     for (size_t i = 0; i < MAX_ANZAHL_ZONEN; i++)
-//     {
-//         if (_zonen[i].selectable)
-//             m_selectable_zonen++;
-//         zonen[i] = _zonen[i];
-//     }
-// }
 
 Bildschirm::Bildschirm(Zone **zonen, unsigned int _count_zonen)
 {
