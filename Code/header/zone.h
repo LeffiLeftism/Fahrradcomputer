@@ -52,26 +52,26 @@ public:
 
     void setVal(double num, unsigned int dez)
     {
-        String strNum = String(num, dez);
+        String str = String(num, dez);        
         String newVal = "";
-        for (size_t i = strNum.length(); i < countChars; i++)
+        for (size_t i = str.length(); i < countChars; i++)
         {
             newVal += " ";
         }
-        newVal += strNum;
-        val = strNum;
+        newVal += str;
+        val = newVal;
     }
 
     void setVal(int num)
     {
-        String strNum = String(num);
+        String str = String(num);
         String newVal = "";
-        for (size_t i = strNum.length(); i < countChars; i++)
+        for (size_t i = str.length(); i < countChars; i++)
         {
             newVal += " ";
         }
-        newVal += strNum;
-        val = strNum;
+        newVal += str;
+        val = newVal;
     }
 
     void setVal(String _val)
