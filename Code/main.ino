@@ -21,6 +21,11 @@
 #include "header/zone.h"
 #endif
 
+#ifndef MAGNETSENSOR_H
+#define MAGNETSENSOR_H
+#include "header/MagnetSensor.h"
+#endif
+
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
 #define OLED_RESET 7        // Reset pin #
@@ -133,6 +138,8 @@ unsigned char hoehe1[] = {
     0x00, 0x00, 0x00  // ........................
 };
 
+/****** Bildschirmeinstellungen ******/
+
 Zone z1(0, 0, 3, 4);                // Zone 1     speed-value
 Zone z2(75, 2, 1, 2, "km");         // Zone 2     "km"
 Zone z3(75, 11, 1, 2, "/h");        // Zone 3     "/h"
@@ -158,11 +165,14 @@ Bitmap bike[] = {
     {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[2]}};
 Animation animation_bike(bike, 750);
 Bitmap hoehe(SCREEN_WIDTH - 17, 41, 17, 15, 45, hoehe1);
+/****** Sensoren ******/
+MagnetSensor Pedal_RPM(2, 60000, 1);
 
-unsigned long time_1;
+/****** Variablen ******/
 // -------------------- CODE --------------------
 void setup()
 {
+    attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func, LOW);
 #ifndef PI_PICO
     Wire.begin();
 #endif
@@ -180,14 +190,23 @@ void setup()
 
 void loop()
 {
-    time_1 = millis();
+
     oled.clearDisplay();
-    if (millis() > 10000)
-        animation_bike.setFrame(int(random(3)));
-    z1.setVal(millis() / 1000);
+    Pedal_RPM.update();
+    z4.setVal(Pedal_RPM.m_ptr_var, 1);
     printBildschirme();
     oled.display();
-    z12.setVal(millis() - time_1, 2);
+}
+
+// ------------------ Interrupt Funktionen ------------------
+
+void interrupt_func()
+{
+    Pedal_RPM.interrupt();
+    while (digitalRead(Pedal_RPM.m_SensorPin) == 0)
+    {
+        delay(1);
+    }
 }
 
 // ------------------ Eigene Funktionen ------------------
