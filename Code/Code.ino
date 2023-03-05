@@ -185,7 +185,7 @@ void setup()
 
     oled.display();
     delay(2000);
-    animation_bike.start();
+    //animation_bike.start();
 }
 
 void loop()
@@ -194,6 +194,10 @@ void loop()
     oled.clearDisplay();
     Pedal_RPM.update();
     z4.setVal(Pedal_RPM.m_ptr_var, 1);
+    if (Pedal_RPM.m_ptr_var > 0 && !animation_bike.get_animate())
+    {animation_bike.start();} 
+    else if (Pedal_RPM.m_ptr_var == 0) 
+    {animation_bike.stop();}
     printBildschirme();
     oled.display();
 }

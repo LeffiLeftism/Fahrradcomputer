@@ -1,4 +1,4 @@
-#define COUNT_VALUES 20
+#define COUNT_VALUES 5
 
 class MagnetSensor
 {
@@ -75,7 +75,7 @@ private:
 
     void checkTimeout()
     {
-        if (millis() - m_time_lastValue > 10000)
+        if (millis() - m_time_lastValue > 5000)
         {
             noInterrupts();
             m_onceFull = false;

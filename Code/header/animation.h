@@ -61,6 +61,10 @@ public:
         animate = false;
         frame = _frame;
     }
+
+    bool get_animate() {
+        return animate;
+    }
 };
 
 Animation::Animation(Bitmap _maps[], unsigned int _delay)
