@@ -31,9 +31,9 @@
 #include "header/gpsSensor.h"
 #endif
 
-#ifndef SDCARD_H
-#define SDCARD_H
-#include "header/sdCard.h"
+#ifndef SD_H
+#define SD_H
+#include <SD.h>
 #endif
 
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
@@ -236,14 +236,17 @@ MagnetSensor Pedal_RPM(2, 60000, 1);
 UART gpsSerial(0,1);
 GPSSensor GPS;
 
-#include <SD.h>
-MbedSPI SPI_base(16,19,18);
-SDCard sd;
 
 /****** Variablen ******/
+MbedSPI SPI_base(16,19,18);
+File myFile;
+String filename;
 // -------------------- CODE --------------------
 void setup()
 {
+    delay(2000);
+    gpsSerial.begin(9600);
+    SD.begin(17);
     delay(2000);
     attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func, LOW);
 #ifndef PI_PICO
@@ -257,14 +260,8 @@ void setup()
     z12.setVal(404, 0);
     oled.display();
     delay(800);
-    if (!SD.begin(17))
-    {
-        error();
-    }
-    
-    gpsSerial.begin(9600);
+    createFile();
 }
-
 void loop()
 {
     oled.clearDisplay();
@@ -290,8 +287,8 @@ void loop()
     }
     printBildschirme();
     oled.display();
+    addTrackpoint();
 }
-
 // ------------------ Interrupt Funktionen ------------------
 
 void interrupt_func()
@@ -330,6 +327,40 @@ void printBildschirme()
     }
 }
 
+void createFile()
+{
+    // Create CSV-File
+    filename = "testfile.csv";
+    myFile = SD.open(filename, FILE_WRITE);
+    myFile.println("Time,Latitude,Longitude,Altitude,Heartrate,Cadence");
+    myFile.close();
+    // Check if File got created
+    if (!SD.exists(filename))
+    {  
+        error();
+    }
+}
+
+void addTrackpoint()
+{
+    myFile = SD.open(filename, FILE_WRITE);
+    myFile.print(GPS.getDate());
+    myFile.print("T");
+    myFile.print(GPS.getTime());
+    myFile.print("z,");
+    myFile.print(GPS.getLatitude(), 6);
+    myFile.print(",");
+    myFile.print(GPS.getLongitude(), 6);
+    myFile.print(",");
+    myFile.print(GPS.getAltitude(), 2);
+    myFile.print(",");
+    myFile.print(54);
+    myFile.print(",");
+    myFile.print(Pedal_RPM.m_ptr_var, 2);
+    myFile.println();
+    myFile.close();
+}
+
 void error()
 {
     bool state = LOW;
@@ -337,7 +368,7 @@ void error()
     {
         digitalWrite(LED_BUILT_IN, state);
         state = !state;
-        delay(100);
+        delay(500);
     }
 }
 

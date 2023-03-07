@@ -103,15 +103,28 @@ public:
 
     String getTime()
     {
-        String min = String(m_minute);
-        if (min.length() == 1)
-        {
-            min = "0" + min;
-        }
-        String time = String(m_hour) + ":" + min;
-        return time;
+        char buffer[8];
+        sprintf(buffer, "%02d:%02d:%02d", m_hour, m_minute, m_second);
+        return buffer;
+    }
+
+    String getDate()
+    {
+        char buffer[10];
+        sprintf(buffer, "%04d-%02d-%02d", m_year, m_month, m_day);
+        return buffer;
     }
     
+    double getLatitude()
+    {
+        return m_latitude;
+    }
+
+    double getLongitude()
+    {
+        return m_longitude;
+    }
+
     double getAltitude()
     {
         return m_altitude;
