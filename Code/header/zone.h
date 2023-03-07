@@ -46,8 +46,8 @@ public:
         display.print(val);
         if (inverted)
         {
+            display.fillRect(x, y, width, height, 2);
         }
-        // display.fillRect(x, y, width, height, 2);
     }
 
     void setVal(double num, unsigned int dez)

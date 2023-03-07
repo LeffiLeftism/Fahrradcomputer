@@ -26,6 +26,16 @@
 #include "header/MagnetSensor.h"
 #endif
 
+#ifndef GPSSENSOR_H
+#define GPSSENSOR_H
+#include "header/gpsSensor.h"
+#endif
+
+#ifndef SDCARD_H
+#define SDCARD_H
+#include "header/sdCard.h"
+#endif
+
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
 #define OLED_RESET 7        // Reset pin #
@@ -40,6 +50,7 @@ Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &I2C_base, OLED_RESET);
 Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define LED_BUILT_IN 13
 #endif
+
 
 /****** Bitmaps ******/
 /**
@@ -138,66 +149,145 @@ unsigned char hoehe1[] = {
     0x00, 0x00, 0x00  // ........................
 };
 
+unsigned char bitmap_satelite[][16] = {
+    // Satelite 0
+    {
+        0x00,0x00, // ................
+        0x01,0x80, // .......##.......
+        0x01,0x80, // .......##.......
+        0x01,0x80, // .......##.......
+        0x01,0x80, // .......##.......
+        0x03,0x80, // ......###.......
+        0x3F,0x00, // ..######........
+        0x3E,0x80  // ..#####.#.......
+    },
+    // Satelite 1
+    {
+        0x00,0x00, // ................
+        0x01,0x80, // .......##.......
+        0x01,0x80, // .......##.......
+        0x01,0x80, // .......##.......
+        0x05,0x80, // .....#.##.......
+        0x03,0x80, // ......###.......
+        0x3F,0x00, // ..######........
+        0x3E,0x80  // ..#####.#.......
+    },
+    // Satelite 2
+    {
+        0x00,0x00, // ................
+        0x01,0x80, // .......##.......
+        0x0D,0x80, // ....##.##.......
+        0x11,0x80, // ...#...##.......
+        0x15,0x80, // ...#.#.##.......
+        0x03,0x80, // ......###.......
+        0x3F,0x00, // ..######........
+        0x3E,0x80  // ..#####.#.......
+    },
+    // Satelite 3
+    {
+        0x3C,0x00, // ..####..........
+        0x41,0x80, // .#.....##.......
+        0x4D,0x80, // .#..##.##.......
+        0x51,0x80, // .#.#...##.......
+        0x55,0x80, // .#.#.#.##.......
+        0x03,0x80, // ......###.......
+        0x3F,0x00, // ..######........
+        0x3E,0x80  // ..#####.#.......
+    }};
+
 /****** Bildschirmeinstellungen ******/
 
-Zone z1(0, 0, 3, 4);                // Zone 1     speed-value
-Zone z2(75, 2, 1, 2, "km");         // Zone 2     "km"
-Zone z3(75, 11, 1, 2, "/h");        // Zone 3     "/h"
-Zone z4(50, 24, 2, 5, "4444");      // Zone 4     rpm-value
-Zone z5(110, 23, 1, 3, "RPM");      // Zone 5     "RPM"
-Zone z6(110, 32, 1, 3, "Ped");      // Zone 6     "Ped"
-Zone z7(0, 41, 2, 4, "7777");       // Zone 7     power-value
-Zone z8(48, 40, 1, 2, "PW");        // Zone 8     "PW"
-Zone z9(48, 49, 1, 2, "tt");        // Zone 9     "tt"
-Zone z10(62, 41, 2, 4, "1010");     // Zone 10    Höhe über NN -value
-Zone z11(0, 57, 1, 5, "12:15");     // Zone 11    Uhrzeit
-Zone z12(z11.width + 5, 57, 1, 10); // Zone 12    Debug, Output für alles was notwendig ist
+Zone z1(0, 0, 3, 4);                            // Zone 1     speed-value
+Zone z2(75, 2, 1, 2, "km");                     // Zone 2     "km"
+Zone z3(75, 11, 1, 2, "/h");                    // Zone 3     "/h"
+Zone z4(50, 24, 2, 5);                          // Zone 4     rpm-value
+Zone z5(110, 23, 1, 3, "RPM");                  // Zone 5     "RPM"
+Zone z6(110, 32, 1, 3, "Ped");                  // Zone 6     "Ped"
+Zone z7(0, 41, 2, 4, "7777");                   // Zone 7     power-value
+Zone z8(48, 40, 1, 2, "PW");                    // Zone 8     "PW"
+Zone z9(48, 49, 1, 2, "tt");                    // Zone 9     "tt"
+Zone z10(62, 41, 2, 4);                         // Zone 10    Höhe über NN -value
+Zone z11(0, 57, 1, 5, "12:15");                 // Zone 11    Uhrzeit
+Zone z12(z11.width + 5, 57, 1, 10);             // Zone 12    Debug, Output für alles was notwendig ist
+Zone z13(105, 57, 1, 2);                        // Zone 13    Satelite Count
 
-Zone *zonen_dashboard[] = {&z1, &z2, &z3, &z4, &z5, &z6, &z7, &z8, &z9, &z10, &z11, &z12};
+Zone *zonen_dashboard[] = {&z1, &z2, &z3, &z4, &z5, &z6, &z7, &z8, &z9, &z10, &z11, &z12, &z13};
 Zone **ptr_zd = zonen_dashboard;
 
 static unsigned int aktiverBildschirm = 0; // Trackt den aktiven Bildschirm über alle Bildschirme hinweg
-Bildschirm dashboard(ptr_zd, 12);
+Bildschirm dashboard(ptr_zd, 13);
 
 Bitmap bike[] = {
     {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[0]},
     {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[1]},
     {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[2]}};
-Animation animation_bike(bike, 750);
+Animation animation_bike(bike, 750, 3);
+
 Bitmap hoehe(SCREEN_WIDTH - 17, 41, 17, 15, 45, hoehe1);
+
+Bitmap satelite[] = {
+    {117, 56, 10, 8, 16, bitmap_satelite[0]},
+    {117, 56, 10, 8, 16, bitmap_satelite[1]},
+    {117, 56, 10, 8, 16, bitmap_satelite[2]},
+    {117, 56, 10, 8, 16, bitmap_satelite[3]}};
+Animation animation_satelite(satelite, 1000, 4);
 /****** Sensoren ******/
 MagnetSensor Pedal_RPM(2, 60000, 1);
+UART gpsSerial(0,1);
+GPSSensor GPS;
+
+#include <SD.h>
+MbedSPI SPI_base(16,19,18);
+SDCard sd;
 
 /****** Variablen ******/
 // -------------------- CODE --------------------
 void setup()
 {
+    delay(2000);
     attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func, LOW);
 #ifndef PI_PICO
     Wire.begin();
 #endif
-    pinMode(LED_BUILT_IN, OUTPUT);
+    pinMode(LED_BUILT_IN, OUTPUT);    
     if (!oled.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
     {
-        while (1)
-            error();
+        error();
     }
-
+    z12.setVal(404, 0);
     oled.display();
-    delay(2000);
-    //animation_bike.start();
+    delay(800);
+    if (!SD.begin(17))
+    {
+        error();
+    }
+    
+    gpsSerial.begin(9600);
 }
 
 void loop()
 {
-
     oled.clearDisplay();
     Pedal_RPM.update();
+    GPS.update(gpsSerial);
+    z1.setVal(GPS.getSpeed("kph"), 1);
     z4.setVal(Pedal_RPM.m_ptr_var, 1);
+    z10.setVal(GPS.getAltitude(), 0);
+    z11.setVal(GPS.getTime());
+    z13.setVal(String(GPS.getSatelites()));
     if (Pedal_RPM.m_ptr_var > 0 && !animation_bike.get_animate())
     {animation_bike.start();} 
     else if (Pedal_RPM.m_ptr_var == 0) 
     {animation_bike.stop();}
+    if (GPS.getSatelites() > 0 && !animation_satelite.get_animate())
+    {
+        animation_satelite.start();
+    } else if (GPS.getSatelites() == 0)
+    {
+        animation_satelite.setFrame(0);
+        animation_satelite.stop();
+        animation_satelite.update(oled);
+    }
     printBildschirme();
     oled.display();
 }
@@ -222,6 +312,7 @@ void printBildschirme()
     case 0:
         hoehe.print(oled);
         animation_bike.update(oled);
+        animation_satelite.update(oled);
         dashboard.print(oled);
         break;
     case 1:
@@ -233,6 +324,7 @@ void printBildschirme()
     default:
         hoehe.print(oled);
         animation_bike.update(oled);
+        animation_satelite.update(oled);
         dashboard.print(oled);
         break;
     }
@@ -240,14 +332,21 @@ void printBildschirme()
 
 void error()
 {
+    bool state = LOW;
     while (1)
     {
-        toggle(LED_BUILT_IN);
+        digitalWrite(LED_BUILT_IN, state);
+        state = !state;
         delay(100);
     }
 }
 
-void toggle(unsigned int pin)
+void tester()
 {
-    digitalWrite(pin, digitalRead(pin));
+    digitalWrite(LED_BUILT_IN, HIGH);
+    delay(200);
+    digitalWrite(LED_BUILT_IN, LOW);
 }
+
+
+
