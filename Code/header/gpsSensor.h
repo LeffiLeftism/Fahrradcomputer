@@ -116,6 +116,23 @@ public:
     {
         return m_altitude;
     }
+
+    double getSpeed(String str)
+    {
+        if (str == "kph")
+        {
+            return m_speed_kph;
+        } else if (str == "mps")
+        {
+            return m_speed_mps;
+        }
+        return 0;
+    }
+
+    int getSatelites()
+    {
+        return m_satellites;
+    }
 };
 
 GPSSensor::GPSSensor()

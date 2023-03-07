@@ -8,13 +8,14 @@
 #include "bitmap.h"
 #endif
 
-#define MAX_MAPS 3
+#define MAX_MAPS 4
 
 
 class Animation
 {
 private:
     Bitmap maps[MAX_MAPS]; // Maximals Anzahl Bitmaps für eine Animation
+    uint8_t maps_count;    // Genutzte Anzahl Bitmaps für eine Animation
     unsigned int delay;    // ms zwischen Bitmaps
     int frame = 0;         // Aktuell angezeigte Bitmap
     bool animate = false;  // Animation gestartet
@@ -23,7 +24,7 @@ private:
 
 public:
     // Constructor - Destructor
-    Animation(Bitmap _maps[], unsigned int _delay);
+    Animation(Bitmap _maps[], unsigned int _delay, uint8_t _maps_count);
     ~Animation();
     // Functions
     void start()
@@ -42,7 +43,7 @@ public:
         if (millis() - timer > delay && animate)
         {
             frame += direction;
-            if (frame > MAX_MAPS - 1)
+            if (frame > maps_count - 1)
             {
                 frame -= 2;
                 direction = -1;
@@ -67,13 +68,20 @@ public:
     }
 };
 
-Animation::Animation(Bitmap _maps[], unsigned int _delay)
+Animation::Animation(Bitmap _maps[], unsigned int _delay, uint8_t _maps_count)
 {
     delay = _delay;
     for (size_t i = 0; i < MAX_MAPS; i++)
     {
         maps[i] = _maps[i];
     }
+    if (_maps_count > MAX_MAPS)
+    {
+        maps_count = MAX_MAPS;
+    } else {
+        maps_count = _maps_count;
+    }
+    
 }
 
 Animation::~Animation()
