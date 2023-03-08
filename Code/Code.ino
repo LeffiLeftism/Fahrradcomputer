@@ -238,6 +238,7 @@ Bitmap satelite[] = {
 Animation animation_satelite(satelite, 1000, 4);
 /****** Sensoren ******/
 MagnetSensor Pedal_RPM(2, 60000, 1);
+MagnetSensor Wheel_Speed(3, 7974, 1);
 UART gpsSerial(0,1);
 GPSSensor GPS;
 
@@ -254,7 +255,8 @@ void setup()
     gpsSerial.begin(9600);
     SD.begin(17);
     delay(2000);
-    attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func, LOW);
+    attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func1, LOW);
+    attachInterrupt(digitalPinToInterrupt(Wheel_Speed.m_SensorPin), interrupt_func2, LOW);
 #ifndef PI_PICO
     Wire.begin();
 #endif
@@ -270,13 +272,22 @@ void setup()
     TrackerTimer.init();
     TrackerTimer.start();
 }
+
+/*
+1/ms * 1000 ms/s = 1/s
+1/s * 2.215m = 2.215 m/s
+2.215 m/s * 3.6 = km/h
+*/
+
+
 void loop()
 {
     oled.clearDisplay();
     Pedal_RPM.update();
+    Wheel_Speed.update();
     GPS.update(gpsSerial);
     TrackerTimer.update();
-    z1.setVal(GPS.getSpeed("kph"), 1);
+    z1.setVal(Wheel_Speed.m_ptr_var, 1);
     z4.setVal(Pedal_RPM.m_ptr_var, 1);
     z10.setVal(GPS.getAltitude(), 0);
     z11.setVal(GPS.getTime());
@@ -304,10 +315,19 @@ void loop()
 }
 // ------------------ Interrupt Funktionen ------------------
 
-void interrupt_func()
+void interrupt_func1()
 {
     Pedal_RPM.interrupt();
     while (digitalRead(Pedal_RPM.m_SensorPin) == 0)
+    {
+        delay(1);
+    }
+}
+
+void interrupt_func2()
+{
+    Wheel_Speed.interrupt();
+    while (digitalRead(Wheel_Speed.m_SensorPin) == 0)
     {
         delay(1);
     }
