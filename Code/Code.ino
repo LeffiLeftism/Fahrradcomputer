@@ -36,6 +36,11 @@
 #include <SD.h>
 #endif
 
+#ifndef TIMER_H
+#define TIMER_H
+#include "header/timer.h"
+#endif
+
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
 #define OLED_RESET 7        // Reset pin #
@@ -241,6 +246,7 @@ GPSSensor GPS;
 MbedSPI SPI_base(16,19,18);
 File myFile;
 String filename;
+Timer TrackerTimer(1000);
 // -------------------- CODE --------------------
 void setup()
 {
@@ -261,12 +267,15 @@ void setup()
     oled.display();
     delay(800);
     createFile();
+    TrackerTimer.init();
+    TrackerTimer.start();
 }
 void loop()
 {
     oled.clearDisplay();
     Pedal_RPM.update();
     GPS.update(gpsSerial);
+    TrackerTimer.update();
     z1.setVal(GPS.getSpeed("kph"), 1);
     z4.setVal(Pedal_RPM.m_ptr_var, 1);
     z10.setVal(GPS.getAltitude(), 0);
@@ -287,7 +296,11 @@ void loop()
     }
     printBildschirme();
     oled.display();
-    addTrackpoint();
+    if (TrackerTimer.isFinished())
+    {
+        addTrackpoint();
+        TrackerTimer.start();
+    }
 }
 // ------------------ Interrupt Funktionen ------------------
 
