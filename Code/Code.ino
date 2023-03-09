@@ -288,6 +288,15 @@ void loop()
 }
 // ------------------ Interrupt Funktionen ------------------
 
+void interrupt_func1()
+{
+    Pedal_RPM.interrupt();
+    while (digitalRead(Pedal_RPM.m_SensorPin) == 0)
+    {
+        delay(1);
+    }
+}
+
 void interrupt_func2()
 {
     Wheel_Speed.interrupt();
@@ -339,15 +348,6 @@ void setZoneValues()
     z10.setVal(GPS.getAltitude(), 0);
     z11.setVal(GPS.getTime());
     z13.setVal(String(GPS.getSatelites()));
-}
-
-void interrupt_func1()
-{
-    Pedal_RPM.interrupt();
-    while (digitalRead(Pedal_RPM.m_SensorPin) == 0)
-    {
-        delay(1);
-    }
 }
 
 void error()
