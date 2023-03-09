@@ -58,11 +58,9 @@ Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
 /****** Bitmaps ******/
-/**
+/*
  * Made with Marlin Bitmap Converter
  * https://marlinfw.org/tools/u8glib/converter.html
- *
- *
  */
 
 unsigned char bitmap_bike[][88] = {
@@ -135,7 +133,6 @@ unsigned char bitmap_bike[][88] = {
      0x70, 0xE0, 0x38, 0x38,
      0x3F, 0xE0, 0x1F, 0xF0,
      0x1F, 0x80, 0x0F, 0xE0}};
-
 unsigned char hoehe1[] = {
     0x00, 0x00, 0x00, // ........................
     0x00, 0x04, 0x00, // .............#..........
@@ -153,7 +150,6 @@ unsigned char hoehe1[] = {
     0x00, 0x04, 0x00, // .............#..........
     0x00, 0x00, 0x00  // ........................
 };
-
 unsigned char bitmap_satelite[][16] = {
     // Satelite 0
     {
@@ -200,7 +196,21 @@ unsigned char bitmap_satelite[][16] = {
         0x3E,0x80  // ..#####.#.......
     }};
 
-/****** Bildschirmeinstellungen ******/
+Bitmap bike[] = {
+    {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[0]},
+    {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[1]},
+    {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[2]}};
+Bitmap hoehe(SCREEN_WIDTH - 17, 41, 17, 15, 45, hoehe1);
+Bitmap satelite[] = {
+    {117, 56, 10, 8, 16, bitmap_satelite[0]},
+    {117, 56, 10, 8, 16, bitmap_satelite[1]},
+    {117, 56, 10, 8, 16, bitmap_satelite[2]},
+    {117, 56, 10, 8, 16, bitmap_satelite[3]}};
+
+Animation animation_bike(bike, 750, 3);
+Animation animation_satelite(satelite, 1000, 4);
+
+/****** Bildschirm-Einstellungen ******/
 
 Zone z1(0, 0, 3, 4);                            // Zone 1     speed-value
 Zone z2(75, 2, 1, 2, "km");                     // Zone 2     "km"
@@ -219,40 +229,35 @@ Zone z13(105, 57, 1, 2);                        // Zone 13    Satelite Count
 Zone *zonen_dashboard[] = {&z1, &z2, &z3, &z4, &z5, &z6, &z7, &z8, &z9, &z10, &z11, &z12, &z13};
 Zone **ptr_zd = zonen_dashboard;
 
-static unsigned int aktiverBildschirm = 0; // Trackt den aktiven Bildschirm über alle Bildschirme hinweg
-Bildschirm dashboard(ptr_zd, 13);
+Bildschirm B_dashboard(ptr_zd, 13);
 
-Bitmap bike[] = {
-    {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[0]},
-    {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[1]},
-    {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[2]}};
-Animation animation_bike(bike, 750, 3);
+/****** KOM Ports ******/
 
-Bitmap hoehe(SCREEN_WIDTH - 17, 41, 17, 15, 45, hoehe1);
+UART uart_0(0,1);
+MbedSPI spi_0(16,19,18);
 
-Bitmap satelite[] = {
-    {117, 56, 10, 8, 16, bitmap_satelite[0]},
-    {117, 56, 10, 8, 16, bitmap_satelite[1]},
-    {117, 56, 10, 8, 16, bitmap_satelite[2]},
-    {117, 56, 10, 8, 16, bitmap_satelite[3]}};
-Animation animation_satelite(satelite, 1000, 4);
+
+
+
+
 /****** Sensoren ******/
+
 MagnetSensor Pedal_RPM(2, 60000, 1);
 MagnetSensor Wheel_Speed(3, 7974, 1);
-UART gpsSerial(0,1);
 GPSSensor GPS;
 
 
 /****** Variablen ******/
-MbedSPI SPI_base(16,19,18);
+
 File myFile;
 String filename;
-Timer TrackerTimer(1000);
+Timer Timer_fileoutput(1000);
+static unsigned int aktiverBildschirm = 0; // Trackt den aktiven Bildschirm über alle Bildschirme hinweg
 // -------------------- CODE --------------------
 void setup()
 {
     delay(2000);
-    gpsSerial.begin(9600);
+    uart_0.begin(9600);
     SD.begin(17);
     delay(2000);
     attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func1, LOW);
@@ -269,8 +274,8 @@ void setup()
     oled.display();
     delay(800);
     createFile();
-    TrackerTimer.init();
-    TrackerTimer.start();
+    Timer_fileoutput.init();
+    Timer_fileoutput.start();
 }
 
 /*
@@ -283,15 +288,10 @@ void setup()
 void loop()
 {
     oled.clearDisplay();
-    Pedal_RPM.update();
-    Wheel_Speed.update();
-    GPS.update(gpsSerial);
-    TrackerTimer.update();
-    z1.setVal(Wheel_Speed.m_ptr_var, 1);
-    z4.setVal(Pedal_RPM.m_ptr_var, 1);
-    z10.setVal(GPS.getAltitude(), 0);
-    z11.setVal(GPS.getTime());
-    z13.setVal(String(GPS.getSatelites()));
+    updateSensors();
+    setZoneValues();
+
+    // Start/Stop Animation
     if (Pedal_RPM.m_ptr_var > 0 && !animation_bike.get_animate())
     {animation_bike.start();} 
     else if (Pedal_RPM.m_ptr_var == 0) 
@@ -305,24 +305,12 @@ void loop()
         animation_satelite.stop();
         animation_satelite.update(oled);
     }
+
     printBildschirme();
     oled.display();
-    if (TrackerTimer.isFinished())
-    {
-        addTrackpoint();
-        TrackerTimer.start();
-    }
+    addTrackpoint();
 }
 // ------------------ Interrupt Funktionen ------------------
-
-void interrupt_func1()
-{
-    Pedal_RPM.interrupt();
-    while (digitalRead(Pedal_RPM.m_SensorPin) == 0)
-    {
-        delay(1);
-    }
-}
 
 void interrupt_func2()
 {
@@ -343,19 +331,19 @@ void printBildschirme()
         hoehe.print(oled);
         animation_bike.update(oled);
         animation_satelite.update(oled);
-        dashboard.print(oled);
+        B_dashboard.print(oled);
         break;
     case 1:
         hoehe.print(oled);
         animation_bike.update(oled);
-        // dashboard.print(oled);
+        // B_dashboard.print(oled);
         break;
 
     default:
         hoehe.print(oled);
         animation_bike.update(oled);
         animation_satelite.update(oled);
-        dashboard.print(oled);
+        B_dashboard.print(oled);
         break;
     }
 }
@@ -365,7 +353,7 @@ void createFile()
     // Create CSV-File
     filename = "testfile.csv";
     myFile = SD.open(filename, FILE_WRITE);
-    myFile.println("Time,Latitude,Longitude,Altitude,Heartrate,Cadence");
+    myFile.println("Time,Latitude,Longitude,Altitude,Cadence"); //Heartrate not collected
     myFile.close();
     // Check if File got created
     if (!SD.exists(filename))
@@ -376,22 +364,52 @@ void createFile()
 
 void addTrackpoint()
 {
-    myFile = SD.open(filename, FILE_WRITE);
-    myFile.print(GPS.getDate());
-    myFile.print("T");
-    myFile.print(GPS.getTime());
-    myFile.print("z,");
-    myFile.print(GPS.getLatitude(), 6);
-    myFile.print(",");
-    myFile.print(GPS.getLongitude(), 6);
-    myFile.print(",");
-    myFile.print(GPS.getAltitude(), 2);
-    myFile.print(",");
-    myFile.print(54);
-    myFile.print(",");
-    myFile.print(Pedal_RPM.m_ptr_var, 2);
-    myFile.println();
-    myFile.close();
+    if (Timer_fileoutput.isFinished())
+    {
+        Timer_fileoutput.start();
+        myFile = SD.open(filename, FILE_WRITE);
+        myFile.print(GPS.getDate());
+        myFile.print("T");
+        myFile.print(GPS.getTime());
+        myFile.print("z,");
+        myFile.print(GPS.getLatitude(), 6);
+        myFile.print(",");
+        myFile.print(GPS.getLongitude(), 6);
+        myFile.print(",");
+        myFile.print(GPS.getAltitude(), 2);
+        myFile.print(",");
+        // myFile.print(64); Heartrate not collected
+        // myFile.print(",");
+        myFile.print(Pedal_RPM.m_ptr_var, 2);
+        myFile.println();
+        myFile.close();
+    }
+}
+
+void updateSensors()
+{
+    Pedal_RPM.update();
+    Wheel_Speed.update();
+    GPS.update(uart_0);
+    Timer_fileoutput.update();
+}
+
+void setZoneValues()
+{
+    z1.setVal(Wheel_Speed.m_ptr_var, 1);
+    z4.setVal(Pedal_RPM.m_ptr_var, 1);
+    z10.setVal(GPS.getAltitude(), 0);
+    z11.setVal(GPS.getTime());
+    z13.setVal(String(GPS.getSatelites()));
+}
+
+void interrupt_func1()
+{
+    Pedal_RPM.interrupt();
+    while (digitalRead(Pedal_RPM.m_SensorPin) == 0)
+    {
+        delay(1);
+    }
 }
 
 void error()
