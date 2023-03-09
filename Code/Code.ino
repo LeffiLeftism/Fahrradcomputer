@@ -222,15 +222,13 @@ UART uart_0(0,1);
 MbedI2C I2C_base(4, 5);
 MbedSPI spi_0(16,19,18);
 
-
-
 /****** Peripherals ******/
 
 MagnetSensor Pedal_RPM(2, 60000, 1);
 MagnetSensor Wheel_Speed(3, 7974, 1);
 GPSSensor GPS(&uart_0);
 Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &I2C_base, OLED_RESET);
-FileWriter filewriter(17, &GPS);
+FileWriter filewriter;
 
 
 /****** Variablen ******/
@@ -242,7 +240,7 @@ static unsigned int aktiverBildschirm = 0; // Trackt den aktiven Bildschirm übe
 void setup()
 {
     delay(2000);
-    delay(2000);
+    filewriter = FileWriter(17, &GPS);
     attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func1, LOW);
     attachInterrupt(digitalPinToInterrupt(Wheel_Speed.m_SensorPin), interrupt_func2, LOW);
     pinMode(LED_BUILT_IN, OUTPUT);    
@@ -253,6 +251,7 @@ void setup()
     z12.setVal(404, 0);
     oled.display();
     delay(800);
+    filewriter.startRecording();
 }
 
 /*
@@ -261,12 +260,12 @@ void setup()
 2.215 m/s * 3.6 = km/h
 */
 
-
 void loop()
 {
     oled.clearDisplay();
     updateObjects();
     setZoneValues();
+    filewriter.update();
 
     // Start/Stop Animation
     if (Pedal_RPM.m_ptr_var > 0 && !animation_bike.get_animate())
@@ -338,7 +337,6 @@ void updateObjects()
     Pedal_RPM.update();
     Wheel_Speed.update();
     GPS.update();
-    Timer_fileoutput.update();
 }
 
 void setZoneValues()
