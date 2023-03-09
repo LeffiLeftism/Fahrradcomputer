@@ -1,6 +1,9 @@
 //https://elektro.turanis.de/html/prj166/index.html
 
+#ifndef TINYGPS_H
+#define TINYGPS_H
 #include <TinyGPS++.h>
+#endif
 
 
 
@@ -102,10 +105,15 @@ public:
         }
     }
 
-    String getTime()
+    String getTime(bool _spacer)// false= ":", true= "_"
     {
         char buffer[8];
-        sprintf(buffer, "%02d:%02d:%02d", m_hour, m_minute, m_second);
+        if (_spacer)
+        {
+            sprintf(buffer, "%02d:%02d:%02d", m_hour, m_minute, m_second);
+        } else {
+            sprintf(buffer, "%02d_%02d_%02d", m_hour, m_minute, m_second);
+        }
         return buffer;
     }
 
