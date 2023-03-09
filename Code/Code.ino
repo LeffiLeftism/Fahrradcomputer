@@ -245,19 +245,16 @@ MbedSPI spi_0(16,19,18);
 MagnetSensor Pedal_RPM(2, 60000, 1);
 MagnetSensor Wheel_Speed(3, 7974, 1);
 GPSSensor GPS(&uart_0);
+FileWriter filewriter(17, &GPS);
 
 
 /****** Variablen ******/
 
-File myFile;
-String filename;
-Timer Timer_fileoutput(1000);
 static unsigned int aktiverBildschirm = 0; // Trackt den aktiven Bildschirm über alle Bildschirme hinweg
 // -------------------- CODE --------------------
 void setup()
 {
     delay(2000);
-    SD.begin(17);
     delay(2000);
     attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func1, LOW);
     attachInterrupt(digitalPinToInterrupt(Wheel_Speed.m_SensorPin), interrupt_func2, LOW);
@@ -272,9 +269,6 @@ void setup()
     z12.setVal(404, 0);
     oled.display();
     delay(800);
-    createFile();
-    Timer_fileoutput.init();
-    Timer_fileoutput.start();
 }
 
 /*
@@ -287,7 +281,7 @@ void setup()
 void loop()
 {
     oled.clearDisplay();
-    updateSensors();
+    updateObjects();
     setZoneValues();
 
     // Start/Stop Animation
@@ -307,7 +301,6 @@ void loop()
 
     printBildschirme();
     oled.display();
-    addTrackpoint();
 }
 // ------------------ Interrupt Funktionen ------------------
 
@@ -347,45 +340,7 @@ void printBildschirme()
     }
 }
 
-void createFile()
-{
-    // Create CSV-File
-    filename = "testfile.csv";
-    myFile = SD.open(filename, FILE_WRITE);
-    myFile.println("Time,Latitude,Longitude,Altitude,Cadence"); //Heartrate not collected
-    myFile.close();
-    // Check if File got created
-    if (!SD.exists(filename))
-    {  
-        error();
-    }
-}
-
-void addTrackpoint()
-{
-    if (Timer_fileoutput.isFinished())
-    {
-        Timer_fileoutput.start();
-        myFile = SD.open(filename, FILE_WRITE);
-        myFile.print(GPS.getDate());
-        myFile.print("T");
-        myFile.print(GPS.getTime());
-        myFile.print("z,");
-        myFile.print(GPS.getLatitude(), 6);
-        myFile.print(",");
-        myFile.print(GPS.getLongitude(), 6);
-        myFile.print(",");
-        myFile.print(GPS.getAltitude(), 2);
-        myFile.print(",");
-        // myFile.print(64); Heartrate not collected
-        // myFile.print(",");
-        myFile.print(Pedal_RPM.m_ptr_var, 2);
-        myFile.println();
-        myFile.close();
-    }
-}
-
-void updateSensors()
+void updateObjects()
 {
     Pedal_RPM.update();
     Wheel_Speed.update();
