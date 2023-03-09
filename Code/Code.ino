@@ -244,7 +244,7 @@ MbedSPI spi_0(16,19,18);
 
 MagnetSensor Pedal_RPM(2, 60000, 1);
 MagnetSensor Wheel_Speed(3, 7974, 1);
-GPSSensor GPS;
+GPSSensor GPS(&uart_0);
 
 
 /****** Variablen ******/
@@ -257,7 +257,6 @@ static unsigned int aktiverBildschirm = 0; // Trackt den aktiven Bildschirm übe
 void setup()
 {
     delay(2000);
-    uart_0.begin(9600);
     SD.begin(17);
     delay(2000);
     attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func1, LOW);
@@ -390,7 +389,7 @@ void updateSensors()
 {
     Pedal_RPM.update();
     Wheel_Speed.update();
-    GPS.update(uart_0);
+    GPS.update();
     Timer_fileoutput.update();
 }
 

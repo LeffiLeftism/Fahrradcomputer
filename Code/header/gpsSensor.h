@@ -11,6 +11,7 @@ private:
     int8_t m_pin_tx = 1;            // TX Pin on GPS Modul to this pin
     uint16_t m_baudrate = 9600;     // Baudrate of GPS Modul
     TinyGPSPlus m_tinyGPS;          // GPS Modul Object to decode serial
+    UART* m_uart;
 
     uint32_t m_satellites;
     uint16_t m_year;
@@ -19,15 +20,15 @@ private:
     double m_speed_mps, m_speed_kph;
 
 public:
-    GPSSensor();
+    GPSSensor(UART *_uart);
     ~GPSSensor();
 public:
 
-    void update(UART &gpsSerial)
+    void update()
     {
-        while (gpsSerial.available() > 0)
+        while (m_uart->available() > 0)
         {
-            m_tinyGPS.encode(gpsSerial.read());
+            m_tinyGPS.encode(m_uart->read());
             if (m_tinyGPS.location.isUpdated())
             {
                 if (m_tinyGPS.satellites.isValid())
@@ -148,8 +149,10 @@ public:
     }
 };
 
-GPSSensor::GPSSensor()
+GPSSensor::GPSSensor(UART *_uart)
 {
+    m_uart = _uart;
+    m_uart->begin(m_baudrate);
 }
 
 GPSSensor::~GPSSensor()
