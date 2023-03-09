@@ -31,31 +31,16 @@
 #include "header/gpsSensor.h"
 #endif
 
-#ifndef SD_H
-#define SD_H
-#include <SD.h>
-#endif
-
-#ifndef TIMER_H
-#define TIMER_H
-#include "header/timer.h"
+#ifndef FILEWRITER_H
+#define FILEWRITER_H
+#include "header/fileWriter.h"
 #endif
 
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
 #define OLED_RESET 7        // Reset pin #
 #define SCREEN_ADDRESS 0x3D ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
-
-#ifdef PI_PICO
-MbedI2C I2C_base(4, 5);
-Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &I2C_base, OLED_RESET);
 #define LED_BUILT_IN 25
-#else
-#include <Wire.h> // SDA: A4 - SCL: A5
-Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-#define LED_BUILT_IN 13
-#endif
-
 
 /****** Bitmaps ******/
 /*
@@ -210,7 +195,7 @@ Bitmap satelite[] = {
 Animation animation_bike(bike, 750, 3);
 Animation animation_satelite(satelite, 1000, 4);
 
-/****** Bildschirm-Einstellungen ******/
+/****** Zonen-Einstellungen ******/
 
 Zone z1(0, 0, 3, 4);                            // Zone 1     speed-value
 Zone z2(75, 2, 1, 2, "km");                     // Zone 2     "km"
@@ -234,33 +219,32 @@ Bildschirm B_dashboard(ptr_zd, 13);
 /****** KOM Ports ******/
 
 UART uart_0(0,1);
+MbedI2C I2C_base(4, 5);
 MbedSPI spi_0(16,19,18);
 
 
 
-
-
-/****** Sensoren ******/
+/****** Peripherals ******/
 
 MagnetSensor Pedal_RPM(2, 60000, 1);
 MagnetSensor Wheel_Speed(3, 7974, 1);
 GPSSensor GPS(&uart_0);
+Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &I2C_base, OLED_RESET);
 FileWriter filewriter(17, &GPS);
 
 
 /****** Variablen ******/
 
 static unsigned int aktiverBildschirm = 0; // Trackt den aktiven Bildschirm über alle Bildschirme hinweg
+
 // -------------------- CODE --------------------
+
 void setup()
 {
     delay(2000);
     delay(2000);
     attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func1, LOW);
     attachInterrupt(digitalPinToInterrupt(Wheel_Speed.m_SensorPin), interrupt_func2, LOW);
-#ifndef PI_PICO
-    Wire.begin();
-#endif
     pinMode(LED_BUILT_IN, OUTPUT);    
     if (!oled.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
     {
