@@ -41,7 +41,7 @@ public:
                 {
                     m_satellites = 0;
                 }
-                                                
+                
                 if (m_tinyGPS.date.isValid())
                 {
                     m_day = m_tinyGPS.date.day();
@@ -53,7 +53,7 @@ public:
                     m_month = 0;
                     m_year = 0;
                 }
-                
+
                 if (m_tinyGPS.time.isValid())
                 {
                     m_centisecond = m_tinyGPS.time.centisecond();
@@ -105,10 +105,10 @@ public:
         }
     }
 
-    String getTime(bool _spacer)// false= ":", true= "_"
+    String getTime(bool _spacer = false)// false= ":", true= "_"
     {
         char buffer[8];
-        if (_spacer)
+        if (!_spacer)
         {
             sprintf(buffer, "%02d:%02d:%02d", m_hour, m_minute, m_second);
         } else {
