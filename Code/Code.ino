@@ -41,6 +41,8 @@
 #include "header/timer.h"
 #endif
 
+#include "header/fileWriter.h"
+
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
 #define OLED_RESET 7        // Reset pin #
@@ -247,13 +249,14 @@ GPSSensor GPS;
 MbedSPI SPI_base(16,19,18);
 File myFile;
 String filename;
-Timer TrackerTimer(1000);
+// Timer TrackerTimer(1000);
+FileWriter fw_test(&SD, &GPS, 17);
 // -------------------- CODE --------------------
 void setup()
 {
     delay(2000);
     gpsSerial.begin(9600);
-    SD.begin(17);
+    fw_test.init();
     delay(2000);
     attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func1, LOW);
     attachInterrupt(digitalPinToInterrupt(Wheel_Speed.m_SensorPin), interrupt_func2, LOW);
@@ -268,9 +271,9 @@ void setup()
     z12.setVal(404, 0);
     oled.display();
     delay(800);
-    createFile();
-    TrackerTimer.init();
-    TrackerTimer.start();
+    fw_test.createFile();
+    // TrackerTimer.init();
+    // TrackerTimer.start();
 }
 
 /*
@@ -286,7 +289,7 @@ void loop()
     Pedal_RPM.update();
     Wheel_Speed.update();
     GPS.update(gpsSerial);
-    TrackerTimer.update();
+    fw_test.update();
     z1.setVal(Wheel_Speed.m_ptr_var, 1);
     z4.setVal(Pedal_RPM.m_ptr_var, 1);
     z10.setVal(GPS.getAltitude(), 0);
@@ -307,11 +310,6 @@ void loop()
     }
     printBildschirme();
     oled.display();
-    if (TrackerTimer.isFinished())
-    {
-        addTrackpoint();
-        TrackerTimer.start();
-    }
 }
 // ------------------ Interrupt Funktionen ------------------
 
@@ -358,40 +356,6 @@ void printBildschirme()
         dashboard.print(oled);
         break;
     }
-}
-
-void createFile()
-{
-    // Create CSV-File
-    filename = "testfile.csv";
-    myFile = SD.open(filename, FILE_WRITE);
-    myFile.println("Time,Latitude,Longitude,Altitude,Heartrate,Cadence");
-    myFile.close();
-    // Check if File got created
-    if (!SD.exists(filename))
-    {  
-        error();
-    }
-}
-
-void addTrackpoint()
-{
-    myFile = SD.open(filename, FILE_WRITE);
-    myFile.print(GPS.getDate());
-    myFile.print("T");
-    myFile.print(GPS.getTime());
-    myFile.print("z,");
-    myFile.print(GPS.getLatitude(), 6);
-    myFile.print(",");
-    myFile.print(GPS.getLongitude(), 6);
-    myFile.print(",");
-    myFile.print(GPS.getAltitude(), 2);
-    myFile.print(",");
-    myFile.print(54);
-    myFile.print(",");
-    myFile.print(Pedal_RPM.m_ptr_var, 2);
-    myFile.println();
-    myFile.close();
 }
 
 void error()
