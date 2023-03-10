@@ -228,7 +228,7 @@ MagnetSensor Pedal_RPM(2, 60000, 1);
 MagnetSensor Wheel_Speed(3, 7974, 1);
 GPSSensor GPS(&uart_0);
 Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &I2C_base, OLED_RESET);
-FileWriter filewriter;
+FileWriter filewriter(17, &GPS, &SD);
 
 
 /****** Variablen ******/
@@ -240,7 +240,8 @@ static unsigned int aktiverBildschirm = 0; // Trackt den aktiven Bildschirm übe
 void setup()
 {
     delay(2000);
-    filewriter = FileWriter(17, &GPS);
+    filewriter.init();
+    delay(2000);
     attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func1, LOW);
     attachInterrupt(digitalPinToInterrupt(Wheel_Speed.m_SensorPin), interrupt_func2, LOW);
     pinMode(LED_BUILT_IN, OUTPUT);    
@@ -251,6 +252,11 @@ void setup()
     z12.setVal(404, 0);
     oled.display();
     delay(800);
+    while (!(GPS.getSatelites() > 0))
+    {
+        GPS.update();
+        delay(1);
+    }
     filewriter.startRecording();
 }
 
@@ -281,7 +287,6 @@ void loop()
         animation_satelite.stop();
         animation_satelite.update(oled);
     }
-
     printBildschirme();
     oled.display();
 }

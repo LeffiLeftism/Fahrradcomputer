@@ -17,10 +17,10 @@
 class FileWriter
 {
     private:
-    SDClass m_SD;
     File m_myFile;
     Timer m_Timer_fileoutput = Timer(1000);
     GPSSensor* m_GPS;
+    SDClass* m_SD;
 
     uint8_t m_pin_cs;
     String m_name;
@@ -30,7 +30,7 @@ class FileWriter
 
     public:
     FileWriter();
-    FileWriter(uint8_t _pin_cs, GPSSensor* _GPS, String _extension);
+    FileWriter(uint8_t _pin_cs, GPSSensor* _GPS, SDClass* _SD, String _extension);
     ~FileWriter();
 
     private:
@@ -43,13 +43,10 @@ class FileWriter
     void createFile()
     {
         setFilename();
-        m_myFile = m_SD.open(m_filename, FILE_WRITE);
+        m_myFile = m_SD->open(m_filename, FILE_WRITE);
         m_myFile.println("Time,Latitude,Longitude,Altitude"); //Heartrate and Cadence not collected
         m_myFile.close();
         m_created = true;
-        digitalWrite(25, HIGH);
-        delay(500);
-        digitalWrite(25, LOW);
         m_Timer_fileoutput.start();
     }
 
@@ -71,14 +68,16 @@ class FileWriter
         // m_myFile.print(Pedal_RPM.m_ptr_var, 2);
         m_myFile.println();
         m_myFile.close();
-
-        digitalWrite(25, HIGH);
-        delay(50);
-        digitalWrite(25, LOW);
     }
 
     
     public:
+    void init()
+    {
+        m_SD->begin(m_pin_cs);
+        m_Timer_fileoutput.init();
+    }
+
     void startRecording()
     {
         if (!m_recording)
@@ -110,16 +109,14 @@ FileWriter::FileWriter()
 
 }
 
-FileWriter::FileWriter(uint8_t _pin_cs, GPSSensor* _GPS, String _extension = "csv")
+FileWriter::FileWriter(uint8_t _pin_cs, GPSSensor* _GPS, SDClass* _SD, String _extension = "csv")
 {   
     m_extension = _extension;
     m_GPS = _GPS;
+    m_SD = _SD;
     m_pin_cs = _pin_cs;
     m_created = false;
     m_recording = false;
-    
-    m_SD.begin(m_pin_cs);
-    m_Timer_fileoutput.init();
 }
 FileWriter::~FileWriter()
 {
