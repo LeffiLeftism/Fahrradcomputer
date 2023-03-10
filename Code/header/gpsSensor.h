@@ -1,6 +1,9 @@
 //https://elektro.turanis.de/html/prj166/index.html
 
+#ifndef TINYGPS_H
+#define TINYGPS_H
 #include <TinyGPS++.h>
+#endif
 
 
 
@@ -11,6 +14,7 @@ private:
     int8_t m_pin_tx = 1;            // TX Pin on GPS Modul to this pin
     uint16_t m_baudrate = 9600;     // Baudrate of GPS Modul
     TinyGPSPlus m_tinyGPS;          // GPS Modul Object to decode serial
+    UART* m_uart;
 
     uint32_t m_satellites;
     uint16_t m_year;
@@ -19,15 +23,15 @@ private:
     double m_speed_mps, m_speed_kph;
 
 public:
-    GPSSensor();
+    GPSSensor(UART *_uart);
     ~GPSSensor();
 public:
 
-    void update(UART &gpsSerial)
+    void update()
     {
-        while (gpsSerial.available() > 0)
+        while (m_uart->available() > 0)
         {
-            m_tinyGPS.encode(gpsSerial.read());
+            m_tinyGPS.encode(m_uart->read());
             if (m_tinyGPS.location.isUpdated())
             {
                 if (m_tinyGPS.satellites.isValid())
@@ -37,7 +41,7 @@ public:
                 {
                     m_satellites = 0;
                 }
-                                                
+                
                 if (m_tinyGPS.date.isValid())
                 {
                     m_day = m_tinyGPS.date.day();
@@ -49,7 +53,7 @@ public:
                     m_month = 0;
                     m_year = 0;
                 }
-                
+
                 if (m_tinyGPS.time.isValid())
                 {
                     m_centisecond = m_tinyGPS.time.centisecond();
@@ -101,17 +105,35 @@ public:
         }
     }
 
-    String getTime()
+    String getTime(bool _spacer = false)// false= ":", true= "_"
     {
-        String min = String(m_minute);
-        if (min.length() == 1)
+        char buffer[8];
+        if (!_spacer)
         {
-            min = "0" + min;
+            sprintf(buffer, "%02d:%02d:%02d", m_hour, m_minute, m_second);
+        } else {
+            sprintf(buffer, "%02d_%02d_%02d", m_hour, m_minute, m_second);
         }
-        String time = String(m_hour) + ":" + min;
-        return time;
+        return buffer;
+    }
+
+    String getDate()
+    {
+        char buffer[10];
+        sprintf(buffer, "%04d-%02d-%02d", m_year, m_month, m_day);
+        return buffer;
     }
     
+    double getLatitude()
+    {
+        return m_latitude;
+    }
+
+    double getLongitude()
+    {
+        return m_longitude;
+    }
+
     double getAltitude()
     {
         return m_altitude;
@@ -135,8 +157,10 @@ public:
     }
 };
 
-GPSSensor::GPSSensor()
+GPSSensor::GPSSensor(UART *_uart)
 {
+    m_uart = _uart;
+    m_uart->begin(m_baudrate);
 }
 
 GPSSensor::~GPSSensor()
