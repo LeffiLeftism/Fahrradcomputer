@@ -36,6 +36,16 @@
 #include "header/fileWriter.h"
 #endif
 
+#ifndef BUTTON_H
+#define BUTTON_H
+#include "header/button.h"
+#endif
+
+#ifndef DEVICE_H
+#define DEVICCE_H
+#include "header/device.h"
+#endif
+
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
 #define OLED_RESET 7        // Reset pin #
@@ -212,9 +222,9 @@ Zone z12(z11.width + 5, 57, 1, 10);             // Zone 12    Debug, Output für
 Zone z13(105, 57, 1, 2);                        // Zone 13    Satelite Count
 
 Zone *zonen_dashboard[] = {&z1, &z2, &z3, &z4, &z5, &z6, &z7, &z8, &z9, &z10, &z11, &z12, &z13};
-Zone **ptr_zd = zonen_dashboard;
 
-Bildschirm B_dashboard(ptr_zd, 13);
+Bildschirm B_dashboard(zonen_dashboard, 13);
+Bildschirm* bildschirm_arr[] = {&B_dashboard};
 
 /****** KOM Ports ******/
 
@@ -228,8 +238,15 @@ MagnetSensor Pedal_RPM(2, 60000, 1);
 MagnetSensor Wheel_Speed(3, 7974, 1);
 GPSSensor GPS(&uart_0);
 Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &I2C_base, OLED_RESET);
-FileWriter filewriter(17, &GPS, &SD);
+Button btn_left(10);
+Button btn_middle(11);
+Button btn_right(12);
 
+MagnetSensor* ms_arr[] = {&Pedal_RPM, &Wheel_Speed};
+Button* btn_arr[] = {&btn_left, &btn_middle, &btn_right};
+
+Device main_device(btn_arr, bildschirm_arr, ms_arr, &oled, &GPS);
+FileWriter filewriter(17, &GPS, &SD);
 
 /****** Variablen ******/
 
@@ -241,6 +258,7 @@ void setup()
 {
     delay(2000);
     filewriter.init();
+    main_device.init();
     delay(2000);
     attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func1, LOW);
     attachInterrupt(digitalPinToInterrupt(Wheel_Speed.m_SensorPin), interrupt_func2, LOW);
@@ -269,7 +287,7 @@ void setup()
 void loop()
 {
     oled.clearDisplay();
-    updateObjects();
+    main_device.print(); // atm just updating Sensors
     setZoneValues();
     filewriter.update();
 

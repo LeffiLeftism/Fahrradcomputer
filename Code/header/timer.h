@@ -1,4 +1,3 @@
-#line 1 "C:\\Users\\Leffi\\Nextcloud\\Projekte\\Fahrradcomputer\\Code\\header\\timer.h"
 class Timer {
   private:
     uint32_t m_start;
