@@ -23,6 +23,12 @@ public:
 
 public:
     // Functions
+    void init()
+    {
+        pinMode(m_SensorPin, INPUT);
+        m_values_diff[0] = millis();
+    }
+
     void update()
     {
         checkTimeout();
@@ -40,6 +46,10 @@ public:
     void interrupt()
     {
         m_interrupted = true;
+        while (digitalRead(m_SensorPin) == 0)
+        {
+            delay(1);
+        }
     }
 
 private:
@@ -91,8 +101,6 @@ MagnetSensor::MagnetSensor(unsigned char SensorPin, unsigned int count_magnets)
 {
     m_count_magnets = count_magnets;
     m_SensorPin = SensorPin;
-    pinMode(m_SensorPin, INPUT);
-    m_values_diff[0] = millis();
 }
 
 MagnetSensor::MagnetSensor(unsigned char SensorPin, double correction_factor, unsigned int count_magnets)
@@ -100,8 +108,6 @@ MagnetSensor::MagnetSensor(unsigned char SensorPin, double correction_factor, un
     m_count_magnets = count_magnets;
     m_SensorPin = SensorPin;
     m_correction_factor = correction_factor;
-    pinMode(m_SensorPin, INPUT);
-    m_values_diff[0] = millis();
 }
 
 MagnetSensor::~MagnetSensor()

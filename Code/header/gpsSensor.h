@@ -16,16 +16,15 @@ private:
     TinyGPSPlus m_tinyGPS;          // GPS Modul Object to decode serial
     UART* m_uart;
 
-    uint32_t m_satellites;
     uint16_t m_year;
     uint8_t m_hour, m_minute, m_second, m_centisecond, m_month, m_day;
     double m_latitude, m_longitude, m_altitude;
     double m_speed_mps, m_speed_kph;
-
 public:
+    uint32_t m_satellites;
+
     GPSSensor(UART *_uart);
     ~GPSSensor();
-public:
 
     void update()
     {
@@ -151,7 +150,7 @@ public:
         return 0;
     }
 
-    int getSatelites()
+    uint32_t getSatelites()
     {
         return m_satellites;
     }

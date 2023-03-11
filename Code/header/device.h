@@ -18,6 +18,11 @@
 #include "gpsSensor.h"
 #endif
 
+#ifndef FILEWRITER_H
+#define FILEWRITER_H
+#include "fileWriter.h"
+#endif
+
 
 class Device
 {
@@ -27,10 +32,17 @@ private:
     MagnetSensor** m_ptr_arr_magnetsensor;
     Adafruit_SSD1306* m_display;
     GPSSensor* m_GPS;
+    FileWriter* m_filewriter;
+
+    uint8_t m_selected_bildschirm;
+    uint8_t m_count_btn;
+    uint8_t m_count_bildschirm;
+    uint8_t m_count_magnetsensor;
+    uint8_t m_count_animation;
     
     void updateButtons()
     {
-        for (size_t i = 0; i < (sizeof(*m_ptr_arr_btn)/sizeof(Button)); i++)
+        for (size_t i = 0; i < m_count_btn; i++)
         {
             (*(m_ptr_arr_btn + i))->update();
         }
@@ -38,7 +50,7 @@ private:
 
     void updateSensors()
     {
-        for (size_t i = 0; i < (sizeof(*m_ptr_arr_magnetsensor)/sizeof(MagnetSensor)); i++)
+        for (size_t i = 0; i < m_count_magnetsensor; i++)
         {
             (*(m_ptr_arr_magnetsensor + i))->update();
         }
@@ -46,35 +58,52 @@ private:
     }
 
 public:
-    Device(Button** _ptr_arr_btn, Bildschirm** _ptr_arr_bildschirm, MagnetSensor** _ptr_arr_magnetsensor, Adafruit_SSD1306* _display, GPSSensor* _GPS);
+    Device(Button** _ptr_arr_btn, uint8_t _count_btn, 
+        Bildschirm** _ptr_arr_bildschirm, uint8_t _count_bildschirm,
+        MagnetSensor** _ptr_arr_magnetsensor, uint8_t _count_magnetsensor,
+        Adafruit_SSD1306* _display, GPSSensor* _GPS, FileWriter* _filewriter);
     ~Device();
 
     void init()
     {
         // Initialize Buttons
-        for (size_t i = 0; i < (sizeof(m_ptr_arr_btn)/sizeof(Button)); i++)
+        for (size_t i = 0; i < m_count_btn; i++)
         {
             (*(m_ptr_arr_btn + i))->init();
         }
+        for (size_t i = 0; i < m_count_magnetsensor; i++)
+        {
+            (*(m_ptr_arr_magnetsensor + i))->init();
+        }
+        
+        m_filewriter->init();
+
     }
 
     void print(){
         updateSensors();
-        /*
-        Print here:
-        - Add Animations to Bildschirm
-        - Let Hoehe be an animation
-        */
+        m_display->clearDisplay();
+        (*(m_ptr_arr_bildschirm + m_selected_bildschirm))->print(m_display);
+        m_display->display();
     }
 };
 
-Device::Device(Button** _ptr_arr_btn, Bildschirm** _ptr_arr_bildschirm, MagnetSensor** _ptr_arr_magnetsensor, Adafruit_SSD1306* _display, GPSSensor* _GPS)
+Device::Device(Button** _ptr_arr_btn, uint8_t _count_btn, 
+        Bildschirm** _ptr_arr_bildschirm, uint8_t _count_bildschirm,
+        MagnetSensor** _ptr_arr_magnetsensor, uint8_t _count_magnetsensor,
+        Adafruit_SSD1306* _display, GPSSensor* _GPS, FileWriter* _filewriter)
 {
     m_ptr_arr_btn = _ptr_arr_btn;
+    m_count_btn = _count_btn;
     m_ptr_arr_bildschirm = _ptr_arr_bildschirm;
-    m_display = _display;
+    m_count_bildschirm = _count_bildschirm;
     m_ptr_arr_magnetsensor = _ptr_arr_magnetsensor;
+    m_count_magnetsensor = _count_magnetsensor;
+
+    m_display = _display;
     m_GPS = _GPS;
+    m_filewriter = _filewriter;
+    m_selected_bildschirm = 0;
 }
 
 Device::~Device()

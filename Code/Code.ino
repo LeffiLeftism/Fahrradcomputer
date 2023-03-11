@@ -1,6 +1,11 @@
 #define PI_PICO
 
 // IMPORT LIBRARYS & HEADERFILES
+#ifndef DEVICE_H
+#define DEVICCE_H
+#include "header/device.h"
+#endif
+
 #ifndef ANIMATION_H
 #define ANIMATION_H
 #include "header/animation.h"
@@ -41,10 +46,6 @@
 #include "header/button.h"
 #endif
 
-#ifndef DEVICE_H
-#define DEVICCE_H
-#include "header/device.h"
-#endif
 
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
@@ -128,8 +129,8 @@ unsigned char bitmap_bike[][88] = {
      0x70, 0xE0, 0x38, 0x38,
      0x3F, 0xE0, 0x1F, 0xF0,
      0x1F, 0x80, 0x0F, 0xE0}};
-unsigned char hoehe1[] = {
-    0x00, 0x00, 0x00, // ........................
+unsigned char hoehe1[][45] = {
+    {0x00, 0x00, 0x00, // ........................
     0x00, 0x04, 0x00, // .............#..........
     0x71, 0xCE, 0x00, // .###...###..###.........
     0x71, 0xD5, 0x00, // .###...###.#.#.#........
@@ -143,7 +144,7 @@ unsigned char hoehe1[] = {
     0x71, 0xD5, 0x00, // .###...###.#.#.#........
     0x71, 0xCE, 0x00, // .###...###..###.........
     0x00, 0x04, 0x00, // .............#..........
-    0x00, 0x00, 0x00  // ........................
+    0x00, 0x00, 0x00}  // ........................
 };
 unsigned char bitmap_satelite[][16] = {
     // Satelite 0
@@ -195,7 +196,7 @@ Bitmap bike[] = {
     {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[0]},
     {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[1]},
     {SCREEN_WIDTH - 30, 0, 30, 22, 88, bitmap_bike[2]}};
-Bitmap hoehe(SCREEN_WIDTH - 17, 41, 17, 15, 45, hoehe1);
+Bitmap hoehe[] = {{SCREEN_WIDTH - 17, 41, 17, 15, 45, hoehe1[0]}};
 Bitmap satelite[] = {
     {117, 56, 10, 8, 16, bitmap_satelite[0]},
     {117, 56, 10, 8, 16, bitmap_satelite[1]},
@@ -203,7 +204,10 @@ Bitmap satelite[] = {
     {117, 56, 10, 8, 16, bitmap_satelite[3]}};
 
 Animation animation_bike(bike, 750, 3);
+Animation animation_hoehe(hoehe, 10000, 1);
 Animation animation_satelite(satelite, 1000, 4);
+
+Animation* animation_arr[] = {&animation_bike, &animation_satelite, &animation_hoehe};
 
 /****** Zonen-Einstellungen ******/
 
@@ -218,12 +222,12 @@ Zone z8(48, 40, 1, 2, "PW");                    // Zone 8     "PW"
 Zone z9(48, 49, 1, 2, "tt");                    // Zone 9     "tt"
 Zone z10(62, 41, 2, 4);                         // Zone 10    Höhe über NN -value
 Zone z11(0, 57, 1, 5, "12:15");                 // Zone 11    Uhrzeit
-Zone z12(z11.width + 5, 57, 1, 10);             // Zone 12    Debug, Output für alles was notwendig ist
+Zone z12(35, 57, 1, 10);           // Zone 12    Debug, Output für alles was notwendig ist
 Zone z13(105, 57, 1, 2);                        // Zone 13    Satelite Count
 
 Zone *zonen_dashboard[] = {&z1, &z2, &z3, &z4, &z5, &z6, &z7, &z8, &z9, &z10, &z11, &z12, &z13};
 
-Bildschirm B_dashboard(zonen_dashboard, 13);
+Bildschirm B_dashboard(zonen_dashboard, 13, animation_arr, 3);
 Bildschirm* bildschirm_arr[] = {&B_dashboard};
 
 /****** KOM Ports ******/
@@ -245,8 +249,8 @@ Button btn_right(12);
 MagnetSensor* ms_arr[] = {&Pedal_RPM, &Wheel_Speed};
 Button* btn_arr[] = {&btn_left, &btn_middle, &btn_right};
 
-Device main_device(btn_arr, bildschirm_arr, ms_arr, &oled, &GPS);
 FileWriter filewriter(17, &GPS, &SD);
+Device main_device(btn_arr, 3, bildschirm_arr, 1, ms_arr, 2, &oled, &GPS, &filewriter);
 
 /****** Variablen ******/
 
@@ -256,13 +260,17 @@ static unsigned int aktiverBildschirm = 0; // Trackt den aktiven Bildschirm übe
 
 void setup()
 {
+    pinMode(LED_BUILT_IN, OUTPUT); 
     delay(2000);
-    filewriter.init();
     main_device.init();
-    delay(2000);
+
     attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func1, LOW);
     attachInterrupt(digitalPinToInterrupt(Wheel_Speed.m_SensorPin), interrupt_func2, LOW);
-    pinMode(LED_BUILT_IN, OUTPUT);    
+    
+    // Set Animation Thresholds
+    animation_bike.setThreshold(&Pedal_RPM.m_ptr_var);
+    animation_satelite.setThreshold(&GPS.m_satellites);
+    delay(2000);
     if (!oled.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
     {
         error();
@@ -278,35 +286,11 @@ void setup()
     filewriter.startRecording();
 }
 
-/*
-1/ms * 1000 ms/s = 1/s
-1/s * 2.215m = 2.215 m/s
-2.215 m/s * 3.6 = km/h
-*/
-
 void loop()
 {
-    oled.clearDisplay();
-    main_device.print(); // atm just updating Sensors
+    main_device.print();
     setZoneValues();
     filewriter.update();
-
-    // Start/Stop Animation
-    if (Pedal_RPM.m_ptr_var > 0 && !animation_bike.get_animate())
-    {animation_bike.start();} 
-    else if (Pedal_RPM.m_ptr_var == 0) 
-    {animation_bike.stop();}
-    if (GPS.getSatelites() > 0 && !animation_satelite.get_animate())
-    {
-        animation_satelite.start();
-    } else if (GPS.getSatelites() == 0)
-    {
-        animation_satelite.setFrame(0);
-        animation_satelite.stop();
-        animation_satelite.update(oled);
-    }
-    printBildschirme();
-    oled.display();
 }
 // ------------------ Interrupt Funktionen ------------------
 
@@ -329,38 +313,6 @@ void interrupt_func2()
 }
 
 // ------------------ Eigene Funktionen ------------------
-
-void printBildschirme()
-{
-    switch (aktiverBildschirm)
-    {
-    case 0:
-        hoehe.print(oled);
-        animation_bike.update(oled);
-        animation_satelite.update(oled);
-        B_dashboard.print(oled);
-        break;
-    case 1:
-        hoehe.print(oled);
-        animation_bike.update(oled);
-        // B_dashboard.print(oled);
-        break;
-
-    default:
-        hoehe.print(oled);
-        animation_bike.update(oled);
-        animation_satelite.update(oled);
-        B_dashboard.print(oled);
-        break;
-    }
-}
-
-void updateObjects()
-{
-    Pedal_RPM.update();
-    Wheel_Speed.update();
-    GPS.update();
-}
 
 void setZoneValues()
 {
