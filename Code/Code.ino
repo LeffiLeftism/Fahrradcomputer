@@ -220,22 +220,27 @@ void setup()
     pinMode(LED_BUILT_IN, OUTPUT); 
     delay(2000);
     main_device.init();
+    z1.init(Wheel_Speed.getValRef(), 1);
+    z4.init(Pedal_RPM.getValRef(), 1);
+    z10.init(GPS.getAltitudeRef(), 0);
+    z11.init(GPS.getTimeRef());
+    z12.init("DEBUG");
+    z13.init(GPS.getSatelitesRef(), 0);
 
     attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func1, LOW);
     attachInterrupt(digitalPinToInterrupt(Wheel_Speed.m_SensorPin), interrupt_func2, LOW);
     
     // Set Animation Thresholds
-    animation_bike.setThreshold(&Pedal_RPM.m_ptr_var);
-    animation_satelite.setThreshold(&GPS.m_satellites);
+    // animation_bike.setThreshold(&Pedal_RPM.m_ptr_var);
+    // animation_satelite.setThreshold(&GPS.m_satellites);
     delay(2000);
     if (!oled.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
     {
         error();
     }
-    z12.setVal(404, 0);
     oled.display();
     delay(800);
-    while (!(GPS.getSatelites() > 0))
+    while (!(*GPS.getSatelitesRef() > 0))
     {
         GPS.update();
         delay(1);
@@ -246,7 +251,6 @@ void setup()
 void loop()
 {
     main_device.update();
-    setZoneValues();
     main_device.print();
 }
 // ------------------ Interrupt Funktionen ------------------
@@ -270,15 +274,6 @@ void interrupt_func2()
 }
 
 // ------------------ Eigene Funktionen ------------------
-
-void setZoneValues()
-{
-    z1.setVal(Wheel_Speed.m_ptr_var, 1);
-    z4.setVal(Pedal_RPM.m_ptr_var, 1);
-    z10.setVal(GPS.getAltitude(0));
-    z11.setVal(GPS.getTime());
-    z13.setVal(GPS.getSatelites());
-}
 
 void error()
 {

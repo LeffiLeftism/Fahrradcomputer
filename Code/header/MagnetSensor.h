@@ -11,9 +11,9 @@ private:
     bool m_interrupted = false;                // Interrupt am SensorPin erkannt
     double m_correction_factor = 1;            // Faktor zum Umrechnen/Korrigieren des AVG-Wertes
     unsigned int m_count_magnets = 1;          // Anzahl Magneten, welche Interrupts initiieren
-
+    double m_avg;                              // Variablen für average Wert
+    
 public:
-    double m_ptr_var = 0;      // Pointer zur Variablen für average Wert oder Pointer zur Zone oder sowas oder return?
     unsigned char m_SensorPin; // Pin des Sensors
 
     // Constructor - Destructor
@@ -37,10 +37,15 @@ public:
             newValue();
             if (m_onceFull)
             {
-                m_ptr_var = 1 / calc_avg() * m_correction_factor;
+                m_avg = 1 / calc_avg() * m_correction_factor;
             }
             m_interrupted = false;
         }
+    }
+
+    double* getValRef()
+    {
+        return &m_avg;
     }
 
     void interrupt()
@@ -92,7 +97,7 @@ private:
             m_index_values = 0;
             m_time_lastValue = 0;
             interrupts();
-            m_ptr_var = 0;
+            m_avg = 0;
         }
     }
 };
