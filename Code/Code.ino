@@ -245,9 +245,9 @@ void setup()
 
 void loop()
 {
-    main_device.print();
+    main_device.update();
     setZoneValues();
-    filewriter.update();
+    main_device.print();
 }
 // ------------------ Interrupt Funktionen ------------------
 

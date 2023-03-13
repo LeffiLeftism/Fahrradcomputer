@@ -80,8 +80,14 @@ public:
 
     }
 
-    void print(){
+    void update()
+    {
         updateSensors();
+        updateButtons();
+        m_filewriter->update();
+    }
+
+    void print(){
         m_display->clearDisplay();
         (*(m_ptr_arr_bildschirm + m_selected_bildschirm))->print(m_display);
         m_display->display();
