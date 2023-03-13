@@ -1,9 +1,8 @@
-
 class Button
 {
     private:
     uint8_t m_pin;
-    bool m_state;
+    bool m_pressed;
     public:
     
     Button(uint8_t _pin);
@@ -14,18 +13,18 @@ class Button
     public:
     void init()
     {
-        pinMode(m_pin, INPUT);
+        pinMode(m_pin, INPUT_PULLUP);
     }
 
     void update()
     {
-        m_state = digitalRead(m_pin);
-    }
-
-    bool read()
-    {   
-        update();
-        return m_state;
+        m_pressed = false;
+        while (!digitalRead(m_pin))
+        {
+            m_pressed = true;
+            // Debounce delay
+            delay(30);
+        }
     }
 };
 
