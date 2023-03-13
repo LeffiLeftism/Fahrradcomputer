@@ -123,36 +123,36 @@ public:
         return buffer;
     }
     
-    double getLatitude()
+    String getLatitude(uint8_t _length)
     {
-        return m_latitude;
+        return String(m_latitude, _length);
     }
 
-    double getLongitude()
+    String getLongitude(uint8_t _length)
     {
-        return m_longitude;
+        return String(m_longitude, _length);
     }
 
-    double getAltitude()
+    String getAltitude(uint8_t _length)
     {
-        return m_altitude;
+        return String(m_altitude, _length);
     }
 
-    double getSpeed(String str)
+    String getSpeed(String _type, uint8_t _length)
     {
-        if (str == "kph")
+        if (_type == "kph")
         {
-            return m_speed_kph;
-        } else if (str == "mps")
+            return String(m_speed_kph, _length);
+        } else
         {
-            return m_speed_mps;
+            return String(m_speed_mps, _length);
         }
-        return 0;
+        
     }
 
-    uint32_t getSatelites()
+    String getSatelites()
     {
-        return m_satellites;
+        return String(m_satellites);
     }
 };
 

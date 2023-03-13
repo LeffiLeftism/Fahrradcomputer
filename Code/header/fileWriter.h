@@ -57,11 +57,11 @@ class FileWriter
         m_myFile.print("T");
         m_myFile.print(m_GPS->getTime());
         m_myFile.print("z,");
-        m_myFile.print(m_GPS->getLatitude(), 6);
+        m_myFile.print(m_GPS->getLatitude(6));
         m_myFile.print(",");
-        m_myFile.print(m_GPS->getLongitude(), 6);
+        m_myFile.print(m_GPS->getLongitude(6));
         m_myFile.print(",");
-        m_myFile.print(m_GPS->getAltitude(), 2);
+        m_myFile.print(m_GPS->getAltitude(2));
         //m_myFile.print(",");
         // m_myFile.print(64); Heartrate not collected
         // m_myFile.print(",");

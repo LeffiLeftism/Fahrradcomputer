@@ -275,9 +275,9 @@ void setZoneValues()
 {
     z1.setVal(Wheel_Speed.m_ptr_var, 1);
     z4.setVal(Pedal_RPM.m_ptr_var, 1);
-    z10.setVal(GPS.getAltitude(), 0);
+    z10.setVal(GPS.getAltitude(0));
     z11.setVal(GPS.getTime());
-    z13.setVal(String(GPS.getSatelites()));
+    z13.setVal(GPS.getSatelites());
 }
 
 void error()
