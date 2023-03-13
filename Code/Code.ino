@@ -1,51 +1,8 @@
-#define PI_PICO
-
 // IMPORT LIBRARYS & HEADERFILES
 #ifndef DEVICE_H
 #define DEVICCE_H
 #include "header/device.h"
 #endif
-
-#ifndef ANIMATION_H
-#define ANIMATION_H
-#include "header/animation.h"
-#endif
-
-#ifndef BITMAP_H
-#define BITMAP_H
-#include "header/bitmap.h"
-#endif
-
-#ifndef BILDSCHIRM_H
-#define BILDSCHIRM_H
-#include "header/bildschirm.h"
-#endif
-
-#ifndef ZONE_H
-#define ZONE_H
-#include "header/zone.h"
-#endif
-
-#ifndef MAGNETSENSOR_H
-#define MAGNETSENSOR_H
-#include "header/MagnetSensor.h"
-#endif
-
-#ifndef GPSSENSOR_H
-#define GPSSENSOR_H
-#include "header/gpsSensor.h"
-#endif
-
-#ifndef FILEWRITER_H
-#define FILEWRITER_H
-#include "header/fileWriter.h"
-#endif
-
-#ifndef BUTTON_H
-#define BUTTON_H
-#include "header/button.h"
-#endif
-
 
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
