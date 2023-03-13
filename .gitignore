@@ -32,5 +32,6 @@
 *.app
 
 #Own IgnoreFiles
-Code/.vscode
-Code/build
+build
+.vscode
+~*

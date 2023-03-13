@@ -3,44 +3,53 @@
 #include "zone.h"
 #endif
 
-#define MAX_ANZAHL_ZONEN 10
-
+#ifndef ANIMATION_H
+#define ANIMATION_H
+#include "animation.h"
+#endif
 
 class Bildschirm
 {
 private:
-    unsigned int count_zonen = 0;      // Anzahl aller Zonen
-    unsigned int selectable_zonen = 0; // Anzahl auswählbarer Zonen
-    bool inverted = false;             // Invertierte Darstellung
-public:                                //
-    Zone zonen[MAX_ANZAHL_ZONEN];      //
-    bool active = false;               // Bildschirm aktiv angezeigt
-
+    Zone **m_ptr_zonen;                    // Zeigt auf Array, welches die Zonen enthält
+    Animation** m_ptr_arr_animation;
+    uint8_t m_count_zonen = 0;      // Anzahl aller Zonen
+    uint8_t m_selectable_zonen = 0; // Anzahl auswählbarer Zonen
+    uint8_t m_count_animation;
+    bool m_inverted = false;             // Invertierte Darstellung
+    bool m_active = false;                 // Bildschirm aktiv angezeigt
+    
+public:     
     // Constructor - Destructor
-    Bildschirm(Zone _zonen[MAX_ANZAHL_ZONEN], unsigned int _count_zonen);
+    Bildschirm(
+        Zone **zonen, uint8_t _count_zonen,
+        Animation** _ptr_arr_animation, uint8_t _count_animation);
     ~Bildschirm();
 
     // Functions
-    void print(Adafruit_SSD1306 &display)
+    void print(Adafruit_SSD1306* display)
     {
         // display.clearDisplay();
-        for (size_t i = 0; i < count_zonen; i++)
+        for (size_t i = 0; i < m_count_zonen; i++)
         {
-            zonen[i].print(display);
+            // zonen[i].print(display);
+            (*(m_ptr_zonen + i))->print(display);
         }
-        // display.display();
+        for (size_t i = 0; i < m_count_animation; i++)
+        {
+            (*(m_ptr_arr_animation + i))->update(display);
+        }
     }
 };
 
-Bildschirm::Bildschirm(Zone _zonen[MAX_ANZAHL_ZONEN], unsigned int _count_zonen)
+Bildschirm::Bildschirm(
+    Zone **zonen, uint8_t _count_zonen,
+    Animation** _ptr_arr_animation, uint8_t _count_animation)
 {
-    count_zonen = _count_zonen;
-    for (size_t i = 0; i < MAX_ANZAHL_ZONEN; i++)
-    {
-        if (_zonen[i].selectable)
-            selectable_zonen++;
-        zonen[i] = _zonen[i];
-    }
+    m_ptr_zonen = zonen;
+    m_count_zonen = _count_zonen;
+    m_ptr_arr_animation = _ptr_arr_animation;
+    m_count_animation = _count_animation;
 }
 
 Bildschirm::~Bildschirm()

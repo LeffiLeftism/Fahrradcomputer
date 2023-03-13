@@ -15,25 +15,24 @@
 class Bitmap
 {
 private:
-    unsigned int x;                       // x-Position
-    unsigned int y;                       // y-Position
-    unsigned int width;                   // Breite
-    unsigned int height;                  // Höhe
-    unsigned char map[MAX_BITMAP_LENGTH]; // Bitmap Pixel
-    bool inverted;                        // Invertierte Darstellung
-public:
-    unsigned int len; // Länge der Bitmap Pixel
+    unsigned int m_x;                       // x-Position
+    unsigned int m_y;                       // y-Position
+    unsigned int m_width;                   // Breite
+    unsigned int m_height;                  // Höhe
+    unsigned char m_map[MAX_BITMAP_LENGTH]; // Bitmap Pixel
+    bool m_inverted;                        // Invertierte Darstellung
+    unsigned int m_len;                     // Länge der Bitmap Pixel
 
+public:
     // Constructor - Destructor
     Bitmap();
     Bitmap(unsigned int x, unsigned int y, unsigned int _width,
            unsigned int _height, unsigned int _len, unsigned char _map[]);
     ~Bitmap();
     // Functions
-    void print(Adafruit_SSD1306 &display)
+    void print(Adafruit_SSD1306* display)
     {
-        display.drawBitmap(x, y, map, width, height, 1);
-        // display.display();
+        display->drawBitmap(m_x, m_y, m_map, m_width, m_height, 1);
     }
 };
 
@@ -41,14 +40,14 @@ Bitmap::Bitmap() {}
 Bitmap::Bitmap(unsigned int _x, unsigned int _y, unsigned int _width,
                unsigned int _height, unsigned int _len, unsigned char _map[])
 {
-    x = _x;
-    y = _y;
-    width = _width;
-    height = _height;
-    len = _len;
-    for (size_t i = 0; i < len; i++)
+    m_x = _x;
+    m_y = _y;
+    m_width = _width;
+    m_height = _height;
+    m_len = _len;
+    for (size_t i = 0; i < m_len; i++)
     {
-        map[i] = _map[i];
+        m_map[i] = _map[i];
     }
 }
 
