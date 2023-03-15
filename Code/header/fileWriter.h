@@ -36,7 +36,7 @@ class FileWriter
     private:
     void setFilename()
     {
-        m_name = m_GPS->getTime(true);
+        m_name = *(m_GPS->getTimeRef(true));
         m_filename = m_name + "." + m_extension;
     }
 
@@ -53,15 +53,15 @@ class FileWriter
     void addTrackpoint()
     {
         m_myFile = SD.open(m_filename, FILE_WRITE);
-        m_myFile.print(m_GPS->getDate());
+        m_myFile.print(*(m_GPS->getDateRef()));
         m_myFile.print("T");
-        m_myFile.print(m_GPS->getTime());
+        m_myFile.print(*(m_GPS->getTimeRef()));
         m_myFile.print("z,");
-        m_myFile.print(m_GPS->getLatitude(), 6);
+        m_myFile.print(*(m_GPS->getLatitudeRef()), 6);
         m_myFile.print(",");
-        m_myFile.print(m_GPS->getLongitude(), 6);
+        m_myFile.print(*(m_GPS->getLongitudeRef()), 6);
         m_myFile.print(",");
-        m_myFile.print(m_GPS->getAltitude(), 2);
+        m_myFile.print(*(m_GPS->getAltitudeRef()), 2);
         //m_myFile.print(",");
         // m_myFile.print(64); Heartrate not collected
         // m_myFile.print(",");
@@ -76,6 +76,7 @@ class FileWriter
     {
         m_SD->begin(m_pin_cs);
         m_Timer_fileoutput.init();
+        createFile();
     }
 
     void startRecording()

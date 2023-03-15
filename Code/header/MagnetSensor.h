@@ -11,9 +11,9 @@ private:
     bool m_interrupted = false;                // Interrupt am SensorPin erkannt
     double m_correction_factor = 1;            // Faktor zum Umrechnen/Korrigieren des AVG-Wertes
     unsigned int m_count_magnets = 1;          // Anzahl Magneten, welche Interrupts initiieren
-
+    double m_avg;                              // Variablen für average Wert
+    
 public:
-    double m_ptr_var = 0;      // Pointer zur Variablen für average Wert oder Pointer zur Zone oder sowas oder return?
     unsigned char m_SensorPin; // Pin des Sensors
 
     // Constructor - Destructor
@@ -23,6 +23,12 @@ public:
 
 public:
     // Functions
+    void init()
+    {
+        pinMode(m_SensorPin, INPUT);
+        m_values_diff[0] = millis();
+    }
+
     void update()
     {
         checkTimeout();
@@ -31,15 +37,24 @@ public:
             newValue();
             if (m_onceFull)
             {
-                m_ptr_var = 1 / calc_avg() * m_correction_factor;
+                m_avg = 1 / calc_avg() * m_correction_factor;
             }
             m_interrupted = false;
         }
     }
 
+    double* getValRef()
+    {
+        return &m_avg;
+    }
+
     void interrupt()
     {
         m_interrupted = true;
+        while (digitalRead(m_SensorPin) == 0)
+        {
+            delay(1);
+        }
     }
 
 private:
@@ -82,7 +97,7 @@ private:
             m_index_values = 0;
             m_time_lastValue = 0;
             interrupts();
-            m_ptr_var = 0;
+            m_avg = 0;
         }
     }
 };
@@ -91,8 +106,6 @@ MagnetSensor::MagnetSensor(unsigned char SensorPin, unsigned int count_magnets)
 {
     m_count_magnets = count_magnets;
     m_SensorPin = SensorPin;
-    pinMode(m_SensorPin, INPUT);
-    m_values_diff[0] = millis();
 }
 
 MagnetSensor::MagnetSensor(unsigned char SensorPin, double correction_factor, unsigned int count_magnets)
@@ -100,8 +113,6 @@ MagnetSensor::MagnetSensor(unsigned char SensorPin, double correction_factor, un
     m_count_magnets = count_magnets;
     m_SensorPin = SensorPin;
     m_correction_factor = correction_factor;
-    pinMode(m_SensorPin, INPUT);
-    m_values_diff[0] = millis();
 }
 
 MagnetSensor::~MagnetSensor()

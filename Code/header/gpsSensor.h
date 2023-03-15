@@ -16,16 +16,35 @@ private:
     TinyGPSPlus m_tinyGPS;          // GPS Modul Object to decode serial
     UART* m_uart;
 
-    uint32_t m_satellites;
     uint16_t m_year;
     uint8_t m_hour, m_minute, m_second, m_centisecond, m_month, m_day;
     double m_latitude, m_longitude, m_altitude;
     double m_speed_mps, m_speed_kph;
+    String m_date;
+    String m_time_1; // Time with :
+    String m_time_2; // Time with _
+public:
+    double m_satellites;
 
+private:
+    void calcTime()
+    {
+        char buffer[8];
+        sprintf(buffer, "%02d:%02d:%02d", m_hour, m_minute, m_second);
+        m_time_1 = buffer;
+        sprintf(buffer, "%02d_%02d_%02d", m_hour, m_minute, m_second);
+        m_time_2 = buffer;
+    }
+
+    void calcDate()
+    {
+        char buffer[10];
+        sprintf(buffer, "%04d-%02d-%02d", m_year, m_month, m_day);
+        m_date = buffer;
+    }
 public:
     GPSSensor(UART *_uart);
     ~GPSSensor();
-public:
 
     void update()
     {
@@ -36,7 +55,7 @@ public:
             {
                 if (m_tinyGPS.satellites.isValid())
                 {
-                    m_satellites = m_tinyGPS.satellites.value();
+                    m_satellites = double(m_tinyGPS.satellites.value());
                 } else
                 {
                     m_satellites = 0;
@@ -101,59 +120,57 @@ public:
                     m_speed_kph = 0;
                     m_speed_mps = 0;
                 }
+                calcDate();
+                calcTime();
             }
         }
     }
 
-    String getTime(bool _spacer = false)// false= ":", true= "_"
+    double* getLatitudeRef()
     {
-        char buffer[8];
-        if (!_spacer)
+        return &m_latitude;
+    }
+
+    double* getLongitudeRef()
+    {
+        return &m_longitude;
+    }
+
+    double* getAltitudeRef()
+    {
+        return &m_altitude;
+    }
+
+    double* getSpeedRef(String _type)
+    {
+        if (_type == "kph")
         {
-            sprintf(buffer, "%02d:%02d:%02d", m_hour, m_minute, m_second);
-        } else {
-            sprintf(buffer, "%02d_%02d_%02d", m_hour, m_minute, m_second);
+            return &m_speed_kph;
+        } else
+        {
+            return &m_speed_mps;
         }
-        return buffer;
     }
 
-    String getDate()
+    double* getSatelitesRef()
     {
-        char buffer[10];
-        sprintf(buffer, "%04d-%02d-%02d", m_year, m_month, m_day);
-        return buffer;
-    }
-    
-    double getLatitude()
-    {
-        return m_latitude;
+        return &m_satellites;
     }
 
-    double getLongitude()
+    String* getTimeRef(bool _type = false) // false= ":", true= "_"
     {
-        return m_longitude;
-    }
-
-    double getAltitude()
-    {
-        return m_altitude;
-    }
-
-    double getSpeed(String str)
-    {
-        if (str == "kph")
+        if (_type)
         {
-            return m_speed_kph;
-        } else if (str == "mps")
+            return &m_time_2;
+        } else
         {
-            return m_speed_mps;
+            return &m_time_1;
         }
-        return 0;
     }
 
-    int getSatelites()
+    String* getDateRef()
     {
-        return m_satellites;
+        return &m_date;
     }
 };
 
