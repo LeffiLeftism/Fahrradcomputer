@@ -76,6 +76,7 @@ class FileWriter
     {
         m_SD->begin(m_pin_cs);
         m_Timer_fileoutput.init();
+        createFile();
     }
 
     void startRecording()
