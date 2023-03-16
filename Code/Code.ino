@@ -207,7 +207,7 @@ MagnetSensor* ms_arr[] = {&Pedal_RPM, &Wheel_Speed};
 Button* btn_arr[] = {&btn_left, &btn_middle, &btn_right};
 
 FileWriter filewriter(17, &GPS, &SD);
-ScreenManager screenmanager(btn_arr, 3, bildschirm_arr, 1, &oled);
+ScreenManager screenmanager(btn_arr, 3, bildschirm_arr, 1, &oled, &up, &down, &set, &enter);
 Device main_device(ms_arr, 2, &GPS, &filewriter, &screenmanager);
 
 /****** Variablen ******/
@@ -274,6 +274,26 @@ void interrupt_func2()
 }
 
 // ------------------ Eigene Funktionen ------------------
+
+void up(uint8_t* _ptr, uint8_t _val)
+{
+    (*_ptr) += _val;
+}
+
+void down(uint8_t* _ptr, uint8_t _val)
+{
+    (*_ptr) -= _val;
+}
+
+void set(uint8_t* _ptr, uint8_t _val)
+{
+    (*_ptr) = _val;
+}
+
+void enter(uint8_t* _ptr, uint8_t _val)
+{
+
+}
 
 void error()
 {
