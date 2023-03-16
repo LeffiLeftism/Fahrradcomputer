@@ -207,7 +207,8 @@ MagnetSensor* ms_arr[] = {&Pedal_RPM, &Wheel_Speed};
 Button* btn_arr[] = {&btn_left, &btn_middle, &btn_right};
 
 FileWriter filewriter(17, &GPS, &SD);
-Device main_device(btn_arr, 3, bildschirm_arr, 1, ms_arr, 2, &oled, &GPS, &filewriter);
+ScreenManager screenmanager(btn_arr, 3, bildschirm_arr, 1, &oled);
+Device main_device(ms_arr, 2, &GPS, &filewriter, &screenmanager);
 
 /****** Variablen ******/
 
@@ -240,10 +241,9 @@ void setup()
     }
     oled.display();
     delay(800);
-    while (!(*GPS.getSatelitesRef() > 0))
+    if (!(*GPS.getSatelitesRef() > 0))
     {
-        GPS.update();
-        delay(1);
+        z12.init("NO GPS");
     }
     filewriter.startRecording();
 }
