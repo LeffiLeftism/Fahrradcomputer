@@ -251,7 +251,6 @@ void setup()
 void loop()
 {
     main_device.update();
-    main_device.print();
 }
 // ------------------ Interrupt Funktionen ------------------
 

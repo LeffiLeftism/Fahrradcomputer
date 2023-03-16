@@ -23,6 +23,10 @@
 #include "fileWriter.h"
 #endif
 
+#ifndef TIMER_H
+#define TIMER_H
+#include "timer.h"
+#endif
 
 class Device
 {
@@ -33,6 +37,7 @@ private:
     Adafruit_SSD1306* m_display;
     GPSSensor* m_GPS;
     FileWriter* m_filewriter;
+    Timer m_fps_timer = Timer(uint32_t(1000/4));
 
     uint8_t m_selected_bildschirm;
     uint8_t m_count_btn;
@@ -57,6 +62,13 @@ private:
         m_GPS->update();
     }
 
+    void print(){
+            m_fps_timer.start();
+            m_display->clearDisplay();
+            (*(m_ptr_arr_bildschirm + m_selected_bildschirm))->print(m_display);
+            m_display->display();
+    }
+
 public:
     Device(Button** _ptr_arr_btn, uint8_t _count_btn, 
         Bildschirm** _ptr_arr_bildschirm, uint8_t _count_bildschirm,
@@ -77,7 +89,8 @@ public:
         }
         
         m_filewriter->init();
-
+        m_fps_timer.init();
+        m_fps_timer.start();
     }
 
     void update()
@@ -85,12 +98,8 @@ public:
         updateSensors();
         updateButtons();
         m_filewriter->update();
-    }
-
-    void print(){
-        m_display->clearDisplay();
-        (*(m_ptr_arr_bildschirm + m_selected_bildschirm))->print(m_display);
-        m_display->display();
+        m_fps_timer.update();
+        if (m_fps_timer.isFinished()) print();
     }
 };
 
