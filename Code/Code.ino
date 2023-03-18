@@ -213,6 +213,7 @@ Device main_device(ms_arr, 2, &GPS, &filewriter, &screenmanager);
 /****** Variablen ******/
 
 static unsigned int aktiverBildschirm = 0; // Trackt den aktiven Bildschirm über alle Bildschirme hinweg
+double debugDouble = 0;
 
 // -------------------- CODE --------------------
 
@@ -225,7 +226,7 @@ void setup()
     z4.init(Pedal_RPM.getValRef(), 1);
     z10.init(GPS.getAltitudeRef(), 0);
     z11.init(GPS.getTimeRef());
-    z12.init("DEBUG");
+    z12.init(&debugDouble, 0);
     z13.init(GPS.getSatelitesRef(), 0);
 
     attachInterrupt(digitalPinToInterrupt(Pedal_RPM.m_SensorPin), interrupt_func1, LOW);
@@ -241,15 +242,16 @@ void setup()
     }
     oled.display();
     delay(800);
-    if (!(*GPS.getSatelitesRef() > 0))
+    /*if (!(*GPS.getSatelitesRef() > 0))
     {
         z12.init("NO GPS");
-    }
+    }*/
     filewriter.startRecording();
 }
 
 void loop()
 {
+    debugDouble = double(screenmanager.m_selected_zone);
     main_device.update();
     main_device.print();
 }

@@ -2,7 +2,8 @@ class Button
 {
     private:
     uint8_t m_pin;
-    bool m_pressed;
+    bool m_isPressed = false;
+    bool m_wasPressed = false;
     public:
     
     Button(uint8_t _pin);
@@ -18,13 +19,27 @@ class Button
 
     void update()
     {
-        m_pressed = false;
-        while (!digitalRead(m_pin))
+        m_isPressed = !digitalRead(m_pin);
+        if (m_isPressed)
         {
-            m_pressed = true;
-            // Debounce delay
-            delay(30);
+            m_wasPressed = true;
+            delay(20);
         }
+    }
+
+    bool getIsPressed()
+    {
+        return m_isPressed;
+    }
+
+    bool getWasPressed()
+    {
+        return m_wasPressed;
+    }
+
+    void resetWasPressed()
+    {
+        m_wasPressed = false;
     }
 };
 

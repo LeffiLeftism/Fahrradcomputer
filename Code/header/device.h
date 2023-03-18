@@ -52,13 +52,14 @@ public:
         }
         
         m_filewriter->init();
-
+        m_screenmanager->init();
     }
 
     void update()
     {
         updateSensors();
         m_filewriter->update();
+        m_screenmanager->update();
     }
 
     void print()

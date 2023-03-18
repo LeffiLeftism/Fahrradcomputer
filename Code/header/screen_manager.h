@@ -24,7 +24,7 @@ private:
     void(*m_fct_ptr_down)(uint8_t*, uint8_t) = nullptr;
     void(*m_fct_ptr_set)(uint8_t*, uint8_t) = nullptr;
     void(*m_fct_ptr_enter)(uint8_t*, uint8_t) = nullptr;
-
+public:
     uint8_t m_selected_bildschirm;
     uint8_t m_selected_zone;
     uint8_t m_count_btn;
@@ -33,19 +33,19 @@ private:
     pair btn_fct[1][13][3] = { // Bildschirm - Zone - Button
         // Bildschirm 1
         { // Button 0, 1, 2
-            {pair(m_fct_ptr_down, &m_selected_zone, 1), pair(m_fct_ptr_enter, &m_selected_zone, 1), pair(m_fct_ptr_up, &m_selected_zone, 1)},      // z1
-            {pair(m_fct_ptr_down, &m_selected_zone, 1), pair(m_fct_ptr_enter, &m_selected_zone, 1), pair(m_fct_ptr_up, &m_selected_zone, 1)},      // z2
-            {pair(m_fct_ptr_down, &m_selected_zone, 1), pair(m_fct_ptr_enter, &m_selected_zone, 1), pair(m_fct_ptr_up, &m_selected_zone, 1)},      // z3
-            {pair(m_fct_ptr_down, &m_selected_zone, 1), pair(m_fct_ptr_enter, &m_selected_zone, 1), pair(m_fct_ptr_up, &m_selected_zone, 1)},      // z4
-            {pair(m_fct_ptr_down, &m_selected_zone, 1), pair(m_fct_ptr_enter, &m_selected_zone, 1), pair(m_fct_ptr_up, &m_selected_zone, 1)},      // z5
-            {pair(m_fct_ptr_down, &m_selected_zone, 1), pair(m_fct_ptr_enter, &m_selected_zone, 1), pair(m_fct_ptr_up, &m_selected_zone, 1)},      // z6
-            {pair(m_fct_ptr_down, &m_selected_zone, 1), pair(m_fct_ptr_enter, &m_selected_zone, 1), pair(m_fct_ptr_up, &m_selected_zone, 1)},      // z7
-            {pair(m_fct_ptr_down, &m_selected_zone, 1), pair(m_fct_ptr_enter, &m_selected_zone, 1), pair(m_fct_ptr_up, &m_selected_zone, 1)},      // z8
-            {pair(m_fct_ptr_down, &m_selected_zone, 1), pair(m_fct_ptr_enter, &m_selected_zone, 1), pair(m_fct_ptr_up, &m_selected_zone, 1)},      // z9
-            {pair(m_fct_ptr_down, &m_selected_zone, 1), pair(m_fct_ptr_enter, &m_selected_zone, 1), pair(m_fct_ptr_up, &m_selected_zone, 1)},      // z10
-            {pair(m_fct_ptr_down, &m_selected_zone, 1), pair(m_fct_ptr_enter, &m_selected_zone, 1), pair(m_fct_ptr_up, &m_selected_zone, 1)},      // z11
-            {pair(m_fct_ptr_down, &m_selected_zone, 1), pair(m_fct_ptr_enter, &m_selected_zone, 1), pair(m_fct_ptr_up, &m_selected_zone, 1)},      // z12
-            {pair(m_fct_ptr_down, &m_selected_zone, 1), pair(m_fct_ptr_enter, &m_selected_zone, 1), pair(m_fct_ptr_up, &m_selected_zone, 1)}}      // z13
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 18), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z1
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z2
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z3
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z4
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z5
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z6
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z7
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z8
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z9
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z10
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z11
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z12
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)}}      // z13
     };
 
     void updateButtons()
@@ -54,6 +54,21 @@ private:
         {
             (*(m_ptr_arr_btn + i))->update();
         }
+    }
+
+    void setScreen()
+    {
+        for (size_t i = 0; i < m_count_btn; i++)
+        {
+            bool isPressed = (*(m_ptr_arr_btn + i))->getIsPressed();
+            bool wasPressed = (*(m_ptr_arr_btn + i))->getWasPressed();
+            if (!isPressed && wasPressed)
+            {
+                // do the Code
+                btn_fct[0][0][i].run();
+                (*(m_ptr_arr_btn + i))->resetWasPressed();
+            }
+        }   
     }
 
 public:
@@ -74,6 +89,12 @@ public:
         {
             (*(m_ptr_arr_btn + i))->init();
         }
+    }
+
+    void update()
+    {
+        updateButtons();
+        setScreen();
     }
 
     void print()
@@ -105,6 +126,7 @@ ScreenManager::ScreenManager(
 
     m_display = _display;
     m_selected_bildschirm = 0;
+    m_selected_zone = 10;
 }
 
 ScreenManager::~ScreenManager()
