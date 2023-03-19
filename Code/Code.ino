@@ -253,6 +253,7 @@ void loop()
 {
     debugDouble = double(screenmanager.m_selected_zone);
     main_device.update();
+    main_device.print();
 }
 // ------------------ Interrupt Funktionen ------------------
 
