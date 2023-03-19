@@ -18,6 +18,11 @@
 #include "screen_manager.h"
 #endif
 
+#ifndef TIMER_H
+#define TIMER_H
+#include "timer.h"
+#endif
+
 class Device
 {
 private:
@@ -26,6 +31,9 @@ private:
     FileWriter* m_filewriter;
     ScreenManager* m_screenmanager;
     
+    Timer m_fps_timer = Timer(uint32_t(1000/8));
+    uint8_t m_count_btn;
+    uint8_t m_count_bildschirm;
     uint8_t m_count_magnetsensor;
     uint8_t m_count_animation;
 
@@ -53,6 +61,8 @@ public:
         
         m_filewriter->init();
         m_screenmanager->init();
+        m_fps_timer.init();
+        m_fps_timer.start();
     }
 
     void update()
@@ -64,7 +74,12 @@ public:
 
     void print()
     {
+        m_fps_timer.update();
+        if (m_fps_timer.isFinished())
+        {
         m_screenmanager->print();
+            m_fps_timer.start();
+        }
     }
 };
 
