@@ -109,6 +109,10 @@ class FileWriter
         }
     }
 
+    bool isRecording()
+    {
+        return m_recording;
+    }
 };
 
 FileWriter::FileWriter()

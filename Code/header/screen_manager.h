@@ -40,7 +40,7 @@ public:
     pair btn_fct[1][13][3] = { // Bildschirm - Zone - Button
         // Bildschirm 1
         { // Button 0, 1, 2
-            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 18), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z1
+            {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, nullptr, 0), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z1
             {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z2
             {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z3
             {pair(&m_fct_ptr_down, &m_selected_zone, 1), pair(&m_fct_ptr_enter, &m_selected_zone, 1), pair(&m_fct_ptr_up, &m_selected_zone, 1)},      // z4
