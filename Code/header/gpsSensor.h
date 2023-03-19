@@ -129,6 +129,22 @@ public:
                 calcDate();
                 calcTime();
             }
+            else
+            {
+                m_satellites = 0;
+                m_day = 0;
+                m_month = 0;
+                m_year = 0;
+                m_centisecond = 0;
+                m_second = 0;
+                m_minute = 0;
+                m_hour = 0;
+                m_latitude = 0;
+                m_longitude = 0;
+                m_altitude = 0;
+                m_speed_kph = 0;
+                m_speed_mps = 0;
+            }
         }
     }
 
