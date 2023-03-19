@@ -1,8 +1,8 @@
 struct pair
 {
 private:
-    void(**m_fct_ptr_btn)(uint8_t*, uint8_t) = nullptr;
-    uint8_t* m_ptr;
+    void(**m_fct_ptr_btn)(int8_t*, uint8_t) = nullptr;
+    int8_t* m_ptr;
     uint8_t m_stepsize;
 public:
     pair()
@@ -11,7 +11,7 @@ public:
         m_ptr = nullptr;
         m_stepsize = 0;
     }
-    pair(void(**_fct_ptr_btn)(uint8_t*, uint8_t), uint8_t* _ptr, uint8_t _m_stepsize)
+    pair(void(**_fct_ptr_btn)(int8_t*, uint8_t), int8_t* _ptr, uint8_t _m_stepsize)
     {
         m_fct_ptr_btn = _fct_ptr_btn;
         m_ptr = _ptr;
@@ -24,5 +24,14 @@ public:
         {
         (*m_fct_ptr_btn)(m_ptr, m_stepsize); 
         }
+    }
+    int8_t* getPtr()
+    {
+        return m_ptr;
+    }
+
+    void (**getFctPtr())(int8_t*, uint8_t)
+    {
+        return m_fct_ptr_btn;
     }
 };

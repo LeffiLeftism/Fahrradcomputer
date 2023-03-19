@@ -13,7 +13,7 @@ class Bildschirm
 private:
     Zone **m_ptr_zonen;                    // Zeigt auf Array, welches die Zonen enthält
     Animation** m_ptr_arr_animation;
-    uint8_t m_count_zonen = 0;      // Anzahl aller Zonen
+    uint8_t m_count_zonen;      // Anzahl aller Zonen
     uint8_t m_selectable_zonen = 0; // Anzahl auswählbarer Zonen
     uint8_t m_count_animation;
     bool m_inverted = false;             // Invertierte Darstellung
@@ -27,18 +27,33 @@ public:
     ~Bildschirm();
 
     // Functions
-    void print(Adafruit_SSD1306* display)
+    void print(Adafruit_SSD1306* display, int8_t _selected_zone)
     {
         // display.clearDisplay();
         for (size_t i = 0; i < m_count_zonen; i++)
         {
             // zonen[i].print(display);
             (*(m_ptr_zonen + i))->print(display);
+            if (i == _selected_zone)
+            {
+                (*(m_ptr_zonen + i))->invert(display);
+            }
+            
         }
         for (size_t i = 0; i < m_count_animation; i++)
         {
             (*(m_ptr_arr_animation + i))->update(display);
         }
+    }
+
+    bool getZoneSelectable(uint8_t _selectedZone)
+    {
+        return (*(m_ptr_zonen + _selectedZone))->getSelectable();
+    }
+
+    uint8_t getMaxZones()
+    {
+        return m_count_zonen;
     }
 };
 

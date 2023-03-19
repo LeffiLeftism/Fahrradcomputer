@@ -58,8 +58,8 @@ private:
 public:
     // Constructor - Destructor
     Zone();
-    Zone(uint8_t  _x, uint8_t  _y, uint8_t  _textSize, uint8_t  _countChars);
-    Zone(uint8_t  _x, uint8_t  _y, uint8_t  _textSize, uint8_t  _countChars, String _val);
+    Zone(uint8_t  _x, uint8_t  _y, uint8_t  _textSize, uint8_t  _countChars, bool _selectable);
+    Zone(uint8_t  _x, uint8_t  _y, uint8_t  _textSize, uint8_t  _countChars, String _val, bool _selectable);
     ~Zone();
 
     // Functions
@@ -93,31 +93,42 @@ public:
         display->setTextSize(m_textSize);
         display->setTextColor(1);
         display->print(m_val);
-        if (m_inverted)
+    }
+
+    void invert(Adafruit_SSD1306* display)
+    {
+        if (m_selectable)
         {
-            display->fillRect(m_x, m_y, m_width, m_height, 2);
+            display->fillRect(m_x, m_y, m_width, m_height, 2);   
         }
+    }
+
+    bool getSelectable()
+    {
+        return m_selectable;
     }
 };
 
 Zone::Zone() {}
-Zone::Zone(uint8_t  _x, uint8_t  _y, uint8_t  _textSize, uint8_t  _countChars)
+Zone::Zone(uint8_t  _x, uint8_t  _y, uint8_t  _textSize, uint8_t  _countChars, bool _selectable = true)
 {
     m_x = _x;
     m_y = _y;
     m_textSize = _textSize;
     m_countChars = _countChars;
+    m_selectable = _selectable;
     // Calculated
     m_width = 6 * m_countChars * m_textSize - m_textSize; // Bestimmt die exakt benötigte Breite für die Zone
     m_height = m_textSize * 7 + 1;
 }
 
-Zone::Zone(uint8_t  _x, uint8_t  _y, uint8_t  _textSize, uint8_t  _countChars, String _val)
+Zone::Zone(uint8_t  _x, uint8_t  _y, uint8_t  _textSize, uint8_t  _countChars, String _val, bool _selectable = true)
 {
     m_x = _x;
     m_y = _y;
     m_textSize = _textSize;
     m_countChars = _countChars;
+    m_selectable = _selectable;
     // Calculated
     m_width = 6 * m_countChars * m_textSize - m_textSize; // Bestimmt die exakt benötigte Breite für die Zone
     m_height = m_textSize * 7 + 1;

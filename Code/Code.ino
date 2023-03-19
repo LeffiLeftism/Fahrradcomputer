@@ -168,19 +168,19 @@ Animation* animation_arr[] = {&animation_bike, &animation_satelite, &animation_h
 
 /****** Zonen-Einstellungen ******/
 
-Zone z1(0, 0, 3, 4);                            // Zone 1     speed-value
-Zone z2(75, 2, 1, 2, "km");                     // Zone 2     "km"
-Zone z3(75, 11, 1, 2, "/h");                    // Zone 3     "/h"
+Zone z1(0, 0, 3, 4, false);                     // Zone 1     speed-value
+Zone z2(75, 2, 1, 2, "km", false);              // Zone 2     "km"
+Zone z3(75, 11, 1, 2, "/h", false);             // Zone 3     "/h"
 Zone z4(50, 24, 2, 5);                          // Zone 4     rpm-value
-Zone z5(110, 23, 1, 3, "RPM");                  // Zone 5     "RPM"
-Zone z6(110, 32, 1, 3, "Ped");                  // Zone 6     "Ped"
-Zone z7(0, 41, 2, 4, "7777");                   // Zone 7     power-value
-Zone z8(48, 40, 1, 2, "PW");                    // Zone 8     "PW"
-Zone z9(48, 49, 1, 2, "tt");                    // Zone 9     "tt"
+Zone z5(110, 23, 1, 3, "RPM", false);           // Zone 5     "RPM"
+Zone z6(110, 32, 1, 3, "Ped", false);           // Zone 6     "Ped"
+Zone z7(0, 41, 2, 4, "7777", false);            // Zone 7     power-value
+Zone z8(48, 40, 1, 2, "PW", false);             // Zone 8     "PW"
+Zone z9(48, 49, 1, 2, "tt", false);             // Zone 9     "tt"
 Zone z10(62, 41, 2, 4);                         // Zone 10    Höhe über NN -value
-Zone z11(0, 57, 1, 5, "12:15");                 // Zone 11    Uhrzeit
-Zone z12(35, 57, 1, 10);           // Zone 12    Debug, Output für alles was notwendig ist
-Zone z13(105, 57, 1, 2);                        // Zone 13    Satelite Count
+Zone z11(0, 57, 1, 5, "12:15", false);          // Zone 11    Uhrzeit
+Zone z12(35, 57, 1, 10, false);                 // Zone 12    Debug, Output für alles was notwendig ist
+Zone z13(105, 57, 1, 2, false);                 // Zone 13    Satelite Count
 
 Zone *zonen_dashboard[] = {&z1, &z2, &z3, &z4, &z5, &z6, &z7, &z8, &z9, &z10, &z11, &z12, &z13};
 
@@ -277,22 +277,22 @@ void interrupt_func2()
 
 // ------------------ Eigene Funktionen ------------------
 
-void up(uint8_t* _ptr, uint8_t _val)
+void up(int8_t* _ptr, uint8_t _val)
 {
     (*_ptr) += _val;
 }
 
-void down(uint8_t* _ptr, uint8_t _val)
+void down(int8_t* _ptr, uint8_t _val)
 {
     (*_ptr) -= _val;
 }
 
-void set(uint8_t* _ptr, uint8_t _val)
+void set(int8_t* _ptr, uint8_t _val)
 {
     (*_ptr) = _val;
 }
 
-void enter(uint8_t* _ptr, uint8_t _val)
+void enter(int8_t* _ptr, uint8_t _val)
 {
 
 }
