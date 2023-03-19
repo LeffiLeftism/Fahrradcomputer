@@ -233,8 +233,8 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(Wheel_Speed.m_SensorPin), interrupt_func2, LOW);
     
     // Set Animation Thresholds
-    // animation_bike.setThreshold(&Pedal_RPM.m_ptr_var);
-    // animation_satelite.setThreshold(&GPS.m_satellites);
+    animation_bike.setThreshold(Pedal_RPM.getValRef());
+    animation_satelite.setThreshold(GPS.getSatelitesRef());
     delay(2000);
     if (!oled.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
     {
@@ -251,7 +251,7 @@ void setup()
 
 void loop()
 {
-    debugDouble = double(screenmanager.m_selected_zone);
+    // debugDouble = double(*(animation_bike.m_ptr_threshold_d));
     main_device.update();
     main_device.print();
 }
