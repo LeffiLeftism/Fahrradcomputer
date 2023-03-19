@@ -36,7 +36,14 @@ class FileWriter
     private:
     void setFilename()
     {
-        m_name = *(m_GPS->getTimeRef(true));
+        if (m_GPS->m_satellites > 0)
+        {
+            m_name = *(m_GPS->getTimeRef(true));
+        }
+        else
+        {
+            m_name = "noGPS";
+        }
         m_filename = m_name + "." + m_extension;
     }
 
@@ -76,7 +83,6 @@ class FileWriter
     {
         m_SD->begin(m_pin_cs);
         m_Timer_fileoutput.init();
-        createFile();
     }
 
     void startRecording()
