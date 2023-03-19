@@ -46,6 +46,12 @@ public:
     GPSSensor(UART *_uart);
     ~GPSSensor();
 
+    void init()
+    {
+        m_uart->begin(m_baudrate);
+        update();
+    }
+
     void update()
     {
         while (m_uart->available() > 0)
@@ -177,7 +183,6 @@ public:
 GPSSensor::GPSSensor(UART *_uart)
 {
     m_uart = _uart;
-    m_uart->begin(m_baudrate);
 }
 
 GPSSensor::~GPSSensor()

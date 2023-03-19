@@ -59,6 +59,7 @@ public:
             (*(m_ptr_arr_magnetsensor + i))->init();
         }
         
+        m_GPS->init();
         m_filewriter->init();
         m_screenmanager->init();
         m_fps_timer.init();
